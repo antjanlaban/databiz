@@ -4,37 +4,84 @@
 Next.js 15 app for importing product data (CSV/Excel) to Supabase PostgreSQL.
 Workflow: upload → detect EAN conflicts → resolve conflicts → browse products.
 
+## 🚨 MANDATORY: Pre-flight Check Before Any Action
+
+**BEFORE executing ANY command or answering system state questions:**
+
+```bash
+npm run preflight
+```
+
+This is **NON-NEGOTIABLE**. It checks:
+- ✅ Dev server status (running/stopped)
+- ✅ Supabase connection (connected/failed)
+- ✅ Database tables (exist/missing)
+
+**You CANNOT skip this check. No exceptions.**
+
+### Examples:
+
+❌ **WRONG:**
+```bash
+# User: "Start the dev server"
+npm run dev  # NO! Check first!
+```
+
+✅ **CORRECT:**
+```bash
+# User: "Start the dev server"
+npm run preflight  # Check current state first
+# Output shows server not running → then start it
+# Output shows server running → inform user, don't restart
+```
+
+❌ **WRONG:**
+```
+User: "Does the products table exist?"
+Answer: "Yes, according to the migration file..."
+```
+
+✅ **CORRECT:**
+```bash
+npm run preflight  # Verify actual state
+# Output: "Database: ✅ All tables exist"
+Answer: "Yes, preflight check confirms products table exists and is accessible."
+```
+
 ## 🚨 Critical Rule: NO ASSUMPTIONS, ALWAYS VERIFY
 
 **Always verify the actual system state:**
 
 ### Database & Supabase
 ```bash
-# ✅ Correct: Check database schema in Supabase SQL Editor
-SELECT table_name, column_name, data_type 
-FROM information_schema.columns 
-WHERE table_schema = 'public';
+# ✅ ALWAYS start with preflight
+npm run preflight
 
-# ✅ Check Supabase logs for errors
-# Go to Supabase Dashboard → Logs → API/Database logs
+# ✅ Then check specific details if needed
+curl "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/products?select=*&limit=1" \
+  -H "apikey: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
 
-# ❌ Wrong: Assume migration files reflect current state
+# ❌ NEVER assume migration files reflect current state
 ```
 
 ### Code Verification
 ```bash
+# ✅ MANDATORY: Run preflight before answering
+npm run preflight
+
 # ✅ Test actual API response
 curl http://localhost:3000/api/endpoint
 
 # ✅ Check console.log output in browser/terminal
-# ❌ Assume code works without testing
+# ❌ NEVER assume code works without testing
 ```
 
-**Examples where this fails:**
-- ❌ "The products table has column X" → ✅ Query database: `SELECT * FROM products LIMIT 1`
-- ❌ "The migration was executed" → ✅ Check Supabase Table Editor
-- ❌ "The RLS policy works like this" → ✅ Test with query and check logs
-- ❌ "The env var exists" → ✅ Check with `echo $NEXT_PUBLIC_SUPABASE_URL`
+**Workflow is now enforced:**
+1. User asks question → Run `npm run preflight` → Answer based on output
+2. User reports error → Run `npm run preflight` → Check what's actually wrong
+3. Before executing commands → Run `npm run preflight` → Decide based on state
+
+**No more "shoulds" or "probably" - only verified facts.**
 
 ## Tech Stack
 - Next.js 15 App Router + TypeScript

@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/preflight.mjs && next dev",
+    "dev:force": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",
