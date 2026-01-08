@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 export interface ParsedProduct {
   ean: string;
@@ -56,67 +56,97 @@ export const parseCSV = (file: File): Promise<ParseResult> => {
 };
 
 export const parseExcel = async (file: File): Promise<ParseResult> => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
+  try {
+    const buffer = await file.arrayBuffer();
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+    
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet) {
+      return { data: [], errors: ['No worksheet found in Excel file'] };
+    }
 
-    reader.onload = (e) => {
+    const errors: string[] = [];
+    const products: ParsedProduct[] = [];
+    
+    // Get headers from first row
+    const headerRow = worksheet.getRow(1);
+    const headers: { [key: string]: number } = {};
+    
+    headerRow.eachCell((cell, colNumber) => {
+      const headerName = String(cell.value).toLowerCase().trim();
+      headers[headerName] = colNumber;
+    });
+
+    // Validate required headers exist
+    const requiredHeaders = ['ean', 'name', 'price', 'supplier'];
+    const missingHeaders = requiredHeaders.filter(h => !headers[h]);
+    if (missingHeaders.length > 0) {
+      return { 
+        data: [], 
+        errors: [`Missing required columns: ${missingHeaders.join(', ')}`] 
+      };
+    }
+
+    // Process data rows (skip header row)
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // Skip header row
+      
       try {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+        const eanCell = row.getCell(headers['ean']);
+        const nameCell = row.getCell(headers['name']);
+        const priceCell = row.getCell(headers['price']);
+        const supplierCell = row.getCell(headers['supplier']);
 
-        const errors: string[] = [];
-        const products: ParsedProduct[] = [];
+        const ean = eanCell.value ? String(eanCell.value).trim() : '';
+        const name = nameCell.value ? String(nameCell.value).trim() : '';
+        const priceValue = priceCell.value;
+        const supplier = supplierCell.value ? String(supplierCell.value).trim() : '';
 
-        jsonData.forEach((row: any, index: number) => {
-          try {
-            if (!row.ean && !row.EAN) {
-              errors.push(`Row ${index + 1}: Missing EAN`);
-              return;
-            }
-            if (!row.name && !row.Name) {
-              errors.push(`Row ${index + 1}: Missing name`);
-              return;
-            }
-            if (!row.price && !row.Price) {
-              errors.push(`Row ${index + 1}: Missing price`);
-              return;
-            }
-            if (!row.supplier && !row.Supplier) {
-              errors.push(`Row ${index + 1}: Missing supplier`);
-              return;
-            }
+        if (!ean) {
+          errors.push(`Row ${rowNumber}: Missing EAN`);
+          return;
+        }
+        if (!name) {
+          errors.push(`Row ${rowNumber}: Missing name`);
+          return;
+        }
+        if (!priceValue) {
+          errors.push(`Row ${rowNumber}: Missing price`);
+          return;
+        }
+        if (!supplier) {
+          errors.push(`Row ${rowNumber}: Missing supplier`);
+          return;
+        }
 
-            const price = parseFloat(row.price || row.Price);
-            if (isNaN(price)) {
-              errors.push(`Row ${index + 1}: Invalid price value`);
-              return;
-            }
+        const price = typeof priceValue === 'number' 
+          ? priceValue 
+          : parseFloat(String(priceValue));
+          
+        if (isNaN(price)) {
+          errors.push(`Row ${rowNumber}: Invalid price value`);
+          return;
+        }
 
-            products.push({
-              ean: String(row.ean || row.EAN).trim(),
-              name: String(row.name || row.Name).trim(),
-              price,
-              supplier: String(row.supplier || row.Supplier).trim(),
-            });
-          } catch (error) {
-            errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : String(error)}`);
-          }
+        products.push({
+          ean,
+          name,
+          price,
+          supplier,
         });
-
-        resolve({ data: products, errors });
       } catch (error) {
-        resolve({ data: [], errors: [`Failed to parse Excel file: ${error instanceof Error ? error.message : String(error)}`] });
+        errors.push(`Row ${rowNumber}: ${error instanceof Error ? error.message : String(error)}`);
       }
-    };
+    });
 
-    reader.onerror = () => {
-      resolve({ data: [], errors: ['Failed to read file'] });
+    return { data: products, errors };
+  } catch (error) {
+    return { 
+      data: [], 
+      errors: [`Failed to parse Excel file: ${error instanceof Error ? error.message : String(error)}`] 
     };
-
-    reader.readAsArrayBuffer(file);
-  });
+  }
 };
 
 export const parseFile = async (file: File): Promise<ParseResult> => {

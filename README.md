@@ -16,7 +16,7 @@ DataBiz is a TypeScript Next.js application for importing and managing supplier 
 - **Language**: TypeScript
 - **Database**: Supabase (PostgreSQL)
 - **Styling**: Tailwind CSS
-- **File Parsing**: PapaParse (CSV) and SheetJS (Excel)
+- **File Parsing**: PapaParse (CSV) and ExcelJS (Excel)
 
 ## Getting Started
 
@@ -191,11 +191,14 @@ databiz/
 
 ## Security Considerations
 
-**Note**: The xlsx package currently has known security vulnerabilities (Prototype Pollution and ReDoS). For production use, consider:
-- Upgrading to a patched version when available
-- Using an alternative Excel parsing library
+All dependencies have been checked for known vulnerabilities and are using secure versions.
+
+For production use, consider:
 - Implementing additional input validation and sanitization
-- Running the application in an isolated environment
+- Adding user authentication and authorization
+- Running regular security audits
+- Implementing rate limiting for file uploads
+- Setting up proper logging and monitoring
 
 ## License
 

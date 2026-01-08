@@ -54,6 +54,7 @@ DataBiz is a TypeScript Next.js application built with the App Router pattern, d
 
 ### File Parsing
 - Supports both lowercase and capitalized column names
+- ExcelJS for secure Excel file parsing (replaces vulnerable xlsx package)
 - Validates required fields before insertion
 - Collects errors without stopping the entire import
 - Trims whitespace from string values
@@ -65,10 +66,10 @@ DataBiz is a TypeScript Next.js application built with the App Router pattern, d
 
 ## Security Considerations
 
-### Known Issues
-1. **xlsx package vulnerability**: The SheetJS library has known Prototype Pollution and ReDoS vulnerabilities
-   - Mitigation: Added documentation and warnings
-   - Recommendation: Consider alternative libraries for production
+### Addressed Vulnerabilities
+1. **Excel Parsing**: Replaced vulnerable xlsx package with secure ExcelJS library
+   - No known vulnerabilities in ExcelJS 4.4.0
+   - Better maintained and more feature-rich
 
 2. **No Authentication**: Currently, the application has no authentication
    - Mitigation: This is intentional per requirements
@@ -145,7 +146,7 @@ npm run lint   # ESLint checking
 ## Maintenance Notes
 
 ### Dependencies to Monitor
-- `xlsx`: Check for security patches regularly
+- `exceljs`: Keep updated for new features and security patches
 - `next`: Keep up with Next.js updates
 - `@supabase/supabase-js`: Update for new features
 
