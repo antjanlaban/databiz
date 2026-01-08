@@ -45,7 +45,11 @@ export default function ConflictsPage() {
       if (!conflict) return;
 
       // If using new, update the product
-      if (resolution === 'use_new' && conflict.new_product.name && conflict.new_product.price && conflict.new_product.supplier) {
+      if (resolution === 'use_new' && 
+          conflict.new_product.name && 
+          conflict.new_product.price !== null && 
+          conflict.new_product.price !== undefined && 
+          conflict.new_product.supplier) {
         const { error: updateError } = await supabase
           .from('products')
           .update({

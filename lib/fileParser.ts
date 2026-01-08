@@ -42,7 +42,7 @@ export const parseCSV = (file: File): Promise<ParseResult> => {
               supplier: String(row.supplier).trim(),
             });
           } catch (error) {
-            errors.push(`Row ${index + 1}: ${error}`);
+            errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : String(error)}`);
           }
         });
 
@@ -101,13 +101,13 @@ export const parseExcel = async (file: File): Promise<ParseResult> => {
               supplier: String(row.supplier || row.Supplier).trim(),
             });
           } catch (error) {
-            errors.push(`Row ${index + 1}: ${error}`);
+            errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : String(error)}`);
           }
         });
 
         resolve({ data: products, errors });
       } catch (error) {
-        resolve({ data: [], errors: [`Failed to parse Excel file: ${error}`] });
+        resolve({ data: [], errors: [`Failed to parse Excel file: ${error instanceof Error ? error.message : String(error)}`] });
       }
     };
 

@@ -116,7 +116,7 @@ export default function UploadPage() {
       await supabase
         .from('import_sessions')
         .update({
-          status: conflicts.length > 0 ? 'completed' : 'completed',
+          status: 'completed',
           processed_rows: newProducts.length,
           conflicts_count: conflicts.length,
         })

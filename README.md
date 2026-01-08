@@ -131,6 +131,8 @@ Your CSV or Excel files should have the following columns:
 - **price**: Product price (required, number)
 - **supplier**: Supplier name (required, string)
 
+A sample CSV file (`sample-products.csv`) is included in the repository for reference.
+
 ### Example CSV:
 
 ```csv
@@ -186,6 +188,14 @@ databiz/
 - Advanced filtering and sorting
 - Import history and rollback
 - API endpoints for programmatic access
+
+## Security Considerations
+
+**Note**: The xlsx package currently has known security vulnerabilities (Prototype Pollution and ReDoS). For production use, consider:
+- Upgrading to a patched version when available
+- Using an alternative Excel parsing library
+- Implementing additional input validation and sanitization
+- Running the application in an isolated environment
 
 ## License
 
