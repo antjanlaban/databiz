@@ -166,5 +166,4 @@ When schema changes are needed:
 
 - See `README.md` for setup instructions
 - Database schema in `README.md`
-- Sample CSV file in `sample-products.csv`
 - Code comments for complex logic

@@ -131,8 +131,6 @@ Your CSV or Excel files should have the following columns:
 - **price**: Product price (required, number)
 - **supplier**: Supplier name (required, string)
 
-A sample CSV file (`sample-products.csv`) is included in the repository for reference.
-
 ### Example CSV:
 
 ```csv
