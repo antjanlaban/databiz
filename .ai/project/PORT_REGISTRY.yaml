@@ -1,0 +1,175 @@
+# DataBiz Next - Port Allocation Registry
+# SSOT voor alle port toewijzingen
+# Port Block: 9000-9099 (100 poorten reserved)
+
+project:
+  name: "DataBiz Next"
+  port_block: "9000-9099"
+  reserved: 100
+  last_updated: "2025-12-15"
+  
+environments:
+  development:
+    backend_api: 9000
+    frontend: 9003
+    database: 9020
+    redis: 9021
+    storage: 9022
+    admin: 9040
+    docs: 9041
+    
+  test:
+    backend_api: 9001
+    frontend: 9004
+    e2e_server: 9060
+    mock_api: 9061
+    
+  staging:
+    backend_api: 9002
+    frontend: 9005
+
+services:
+  core:
+    - port: 9000
+      name: "Backend API Dev"
+      env: "development"
+      required: true
+      description: "Main backend API for development"
+      
+    - port: 9001
+      name: "Backend API Test"
+      env: "test"
+      required: true
+      description: "Backend API for test environment"
+      
+    - port: 9002
+      name: "Backend API Staging"
+      env: "staging"
+      required: false
+      description: "Backend API for staging environment"
+      
+    - port: 9003
+      name: "Frontend Dev"
+      env: "development"
+      required: true
+      description: "React/Next.js development server"
+      
+    - port: 9004
+      name: "Frontend Test"
+      env: "test"
+      required: true
+      description: "Frontend dev server for testing"
+      
+    - port: 9005
+      name: "Frontend Staging"
+      env: "staging"
+      required: false
+      description: "Frontend preview build"
+      
+  database:
+    - port: 9020
+      name: "PostgreSQL Local"
+      required: false
+      description: "Local database instance (only if not using cloud DB)"
+      
+    - port: 9021
+      name: "Redis Cache"
+      required: false
+      description: "Cache layer for performance optimization"
+      
+    - port: 9022
+      name: "MinIO/S3 Local"
+      required: false
+      description: "Local object storage for development"
+      
+  tools:
+    - port: 9040
+      name: "Admin Dashboard"
+      required: false
+      description: "Admin interface for data management"
+      
+    - port: 9041
+      name: "API Documentation"
+      required: false
+      description: "Swagger/OpenAPI docs server"
+      
+    - port: 9042
+      name: "Storybook"
+      required: false
+      description: "Component library viewer"
+      
+    - port: 9043
+      name: "GraphQL Playground"
+      required: false
+      description: "GraphQL explorer and testing"
+      
+  testing:
+    - port: 9060
+      name: "E2E Test Server"
+      required: false
+      description: "Backend for E2E tests"
+      
+    - port: 9061
+      name: "Mock API Server"
+      required: false
+      description: "Mock/stub API for frontend testing"
+      
+    - port: 9062
+      name: "Playwright UI Mode"
+      required: false
+      description: "Playwright interactive testing UI"
+      
+    - port: 9063
+      name: "Coverage Server"
+      required: false
+      description: "Test coverage reports viewer"
+      
+  background:
+    - port: 9080
+      name: "Queue Worker Dashboard"
+      required: false
+      description: "BullMQ/Job queue monitoring"
+      
+    - port: 9081
+      name: "Webhook Receiver"
+      required: false
+      description: "Local webhook endpoint for testing"
+      
+    - port: 9082
+      name: "WebSocket Server"
+      required: false
+      description: "Real-time updates server"
+      
+    - port: 9083
+      name: "Health Check Monitor"
+      required: false
+      description: "Service health monitoring dashboard"
+
+# Quick Reference
+quick_start:
+  dev_backend: "http://localhost:9000"
+  dev_frontend: "http://localhost:9003"
+  test_backend: "http://localhost:9001"
+  test_frontend: "http://localhost:9004"
+  api_docs: "http://localhost:9041"
+  
+# Reserved for Future Use
+reserved_ports:
+  - range: "9006-9019"
+    description: "Reserved for additional environments or microservices"
+  - range: "9023-9039"
+    description: "Reserved for additional database/storage services"
+  - range: "9044-9059"
+    description: "Reserved for additional tools and dashboards"
+  - range: "9064-9079"
+    description: "Reserved for additional testing infrastructure"
+  - range: "9084-9099"
+    description: "Reserved for additional background services"
+
+# Notes
+notes:
+  - "All ports in 9000-9099 range are exclusive to DataBiz Next"
+  - "Required ports must be available for project to function"
+  - "Optional ports can be enabled via environment variables"
+  - "Use 'npm run ports:check' to verify availability"
+  - "Use 'npm run clean:ports' to free up all DataBiz ports"

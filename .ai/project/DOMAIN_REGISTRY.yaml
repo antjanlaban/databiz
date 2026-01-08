@@ -1,0 +1,1340 @@
+# DOMAIN REGISTRY (SSOT) - Compact Version
+# Maps: Domain > Epic > Feature > Slice
+#
+# RULES:
+# 1. Every Slice MUST be registered here BEFORE coding
+# 2. Only: id, story, status per slice
+# 3. Acceptance criteria → .ai/project/user-stories/{domain}/{slice_id}.md
+#
+# STATUS: Active - December 19, 2025
+# 🎯 ACTIVE SPRINT: MVP Happy Path (Fase 5-6) - See MVP_HAPPY_PATH.md
+# BACKUP: .ai/project/.archive/DOMAIN_REGISTRY_FULL_2025-12-18.yaml
+#
+# ┌─────────────────────────────────────────────────────────────────────┐
+# │ WORKFLOW DOMAINS (8-Phase Data Flow)                                │
+# ├─────────────────────────────────────────────────────────────────────┤
+# │ Phase 1-3: imports      │ Intake, Mapping, Activation     │ ✅ DONE │
+# │ Phase 4:   catalog      │ Browse/Search supplier products │ ✅ DONE │
+# │ Phase 5:   promotion    │ Select products for assortment  │ 🔄 MVP  │
+# │ Phase 6:   assortment   │ Own Master/Variant products     │ 🔄 MVP  │
+# │ Phase 7:   enrichment   │ Prices, external links          │ PLANNED │
+# │ Phase 8:   export       │ Export to channels              │ PLANNED │
+# ├─────────────────────────────────────────────────────────────────────┤
+# │ SUPPORT DOMAINS                                                     │
+# ├─────────────────────────────────────────────────────────────────────┤
+# │ identity    │ Users, roles, authentication            │ ✅ DONE    │
+# │ maintenance │ Master data (suppliers, brands, etc.)   │ PARTIAL   │
+# │ system      │ AI configuration                        │ ✅ DONE    │
+# │ platform    │ UI shell, navigation, theme             │ ✅ DONE    │
+# └─────────────────────────────────────────────────────────────────────┘
+
+domains:
+  # ============================================================================
+  # IDENTITY DOMAIN - Authentication & Authorization
+  # ============================================================================
+  identity:
+    description: "User authentication and authorization (invite-only)"
+    status: "done"
+    epics:
+      user_lifecycle:
+        features:
+          user_management:
+            slices:
+              create_user:
+                {
+                  id: "IDN-USR-CRE-001",
+                  story: "Admin creates user account",
+                  status: "done",
+                }
+              invite_user:
+                {
+                  id: "IDN-USR-INV-001",
+                  story: "Admin sends invite email",
+                  status: "done",
+                }
+              accept_invite:
+                {
+                  id: "IDN-USR-ACC-001",
+                  story: "User sets password via invite link",
+                  status: "done",
+                }
+      authentication:
+        features:
+          session_management:
+            slices:
+              login:
+                {
+                  id: "IDN-AUTH-LOG-001",
+                  story: "User logs in with email/password",
+                  status: "done",
+                }
+              logout:
+                {
+                  id: "IDN-AUTH-OUT-001",
+                  story: "User logs out securely",
+                  status: "done",
+                }
+              refresh_token:
+                {
+                  id: "IDN-AUTH-REF-001",
+                  story: "Session auto-refreshes",
+                  status: "done",
+                }
+              verify_token:
+                {
+                  id: "IDN-AUTH-VER-001",
+                  story: "System verifies JWT on protected routes",
+                  status: "done",
+                }
+              request_password_reset:
+                {
+                  id: "IDN-AUTH-RST-001",
+                  story: "User requests password reset",
+                  status: "done",
+                }
+              reset_password:
+                {
+                  id: "IDN-AUTH-RST-002",
+                  story: "User sets new password via reset link",
+                  status: "done",
+                }
+      authorization:
+        features:
+          role_management:
+            slices:
+              check_role:
+                {
+                  id: "IDN-AUT-ROL-001",
+                  story: "System checks user roles for access",
+                  status: "done",
+                }
+      testing:
+        features:
+          test_coverage:
+            slices:
+              identity_test_suite:
+                {
+                  id: "IDN-TEST-SUI-001",
+                  story: "Complete test coverage for identity domain",
+                  status: "testing",
+                  notes: "Tests implemented (49 test cases). Import blockers fixed (Category, get_current_user). Tests ready for execution.",
+                }
+
+  # ============================================================================
+  # IMPORTS DOMAIN - File Intake & Dataset Processing
+  # ============================================================================
+  imports:
+    description: "Import supplier files, parse, map fields, activate datasets"
+    status: "done"
+    epics:
+      supplier_management:
+        features:
+          supplier_crud:
+            slices:
+              list_suppliers:
+                {
+                  id: "IMP-SUP-LIST-001",
+                  story: "User views all suppliers",
+                  status: "done",
+                }
+              get_supplier:
+                {
+                  id: "IMP-SUP-GET-001",
+                  story: "User views supplier details",
+                  status: "done",
+                }
+              create_supplier:
+                {
+                  id: "IMP-SUP-CRE-001",
+                  story: "Admin creates new supplier",
+                  status: "done",
+                }
+              update_supplier:
+                {
+                  id: "IMP-SUP-UPD-001",
+                  story: "Admin updates supplier",
+                  status: "done",
+                }
+              delete_supplier:
+                {
+                  id: "IMP-SUP-DEL-001",
+                  story: "Admin deletes supplier",
+                  status: "done",
+                }
+              fuzzy_match_supplier:
+                {
+                  id: "IMP-SUP-FUZ-001",
+                  story: "System matches supplier from filename",
+                  status: "done",
+                }
+              seed_suppliers:
+                {
+                  id: "IMP-SUP-SEED-001",
+                  story: "Admin seeds suppliers from examples",
+                  status: "done",
+                }
+      brand_management:
+        features:
+          brand_crud:
+            slices:
+              list_brands:
+                {
+                  id: "IMP-BRA-LIST-001",
+                  story: "User views all brands",
+                  status: "done",
+                }
+              create_brand:
+                {
+                  id: "IMP-BRA-CRE-001",
+                  story: "Admin creates new brand",
+                  status: "done",
+                }
+              update_brand:
+                {
+                  id: "IMP-BRA-UPD-001",
+                  story: "Admin updates brand",
+                  status: "done",
+                }
+              delete_brand:
+                {
+                  id: "IMP-BRA-DEL-001",
+                  story: "Admin deletes brand",
+                  status: "done",
+                }
+              fuzzy_match_brand:
+                {
+                  id: "IMP-BRA-FUZ-001",
+                  story: "System fuzzy matches brand names",
+                  status: "done",
+                }
+              seed_brands:
+                {
+                  id: "IMP-BRA-SEED-001",
+                  story: "Admin seeds brands from CSV",
+                  status: "done",
+                }
+      file_intake:
+        features:
+          file_upload:
+            slices:
+              generate_upload_url:
+                {
+                  id: "IMP-FIL-URL-001",
+                  story: "System generates presigned URL for direct R2 upload",
+                  status: "planned",
+                }
+              upload_file:
+                {
+                  id: "IMP-FIL-UPL-001",
+                  story: "User uploads supplier file directly to R2",
+                  status: "done",
+                }
+              validate_format:
+                {
+                  id: "IMP-FIL-VAL-001",
+                  story: "System validates file format",
+                  status: "planned",
+                }
+              check_duplicate:
+                {
+                  id: "IMP-FIL-DUP-001",
+                  story: "System checks for duplicate files",
+                  status: "planned",
+                }
+          file_processing:
+            slices:
+              detect_table:
+                {
+                  id: "IMP-FIL-DET-001",
+                  story: "System detects data table in file",
+                  status: "planned",
+                }
+              parse_to_json:
+                {
+                  id: "IMP-FIL-PAR-001",
+                  story: "System parses file to JSON",
+                  status: "planned",
+                }
+              generate_error_report:
+                {
+                  id: "IMP-FIL-ERR-001",
+                  story: "System generates error report",
+                  status: "planned",
+                }
+              cleanup_source:
+                {
+                  id: "IMP-FIL-CLN-001",
+                  story: "System deletes source after parsing",
+                  status: "planned",
+                }
+      field_mapping:
+        features:
+          ai_analysis:
+            slices:
+              analyze_dataset:
+                {
+                  id: "IMP-MAP-ANL-001",
+                  story: "AI analyzes dataset columns",
+                  status: "done",
+                }
+              detect_ean:
+                {
+                  id: "IMP-MAP-EAN-001",
+                  story: "AI detects EAN column",
+                  status: "done",
+                }
+              detect_brand:
+                {
+                  id: "IMP-MAP-BRA-001",
+                  story: "AI detects brand column",
+                  status: "done",
+                }
+              detect_productgroup:
+                {
+                  id: "IMP-MAP-GRP-001",
+                  story: "AI detects productgroup column",
+                  status: "done",
+                }
+              detect_color:
+                {
+                  id: "IMP-MAP-COL-001",
+                  story: "AI detects color column",
+                  status: "done",
+                }
+              detect_size:
+                {
+                  id: "IMP-MAP-SIZ-001",
+                  story: "AI detects size column",
+                  status: "done",
+                }
+              detect_image_url:
+                {
+                  id: "IMP-MAP-IMG-001",
+                  story: "AI detects image URL column",
+                  status: "done",
+                }
+          mapping_validation:
+            slices:
+              show_mapping_proposal:
+                {
+                  id: "IMP-MAP-SHW-001",
+                  story: "User reviews AI mapping suggestions",
+                  status: "done",
+                }
+              save_mapping:
+                {
+                  id: "IMP-MAP-SAV-001",
+                  story: "User saves field mappings",
+                  status: "done",
+                }
+              retrieve_mapping:
+                {
+                  id: "IMP-MAP-GET-001",
+                  story: "System retrieves saved mapping",
+                  status: "done",
+                }
+      dataset_lifecycle:
+        features:
+          dataset_management:
+            slices:
+              register_dataset:
+                {
+                  id: "IMP-DAT-REG-001",
+                  story: "System registers new dataset",
+                  status: "planned",
+                }
+              list_datasets:
+                {
+                  id: "IMP-DAT-LST-001",
+                  story: "User views all datasets",
+                  status: "done",
+                }
+              view_dataset:
+                {
+                  id: "IMP-DAT-VIW-001",
+                  story: "User views dataset details",
+                  status: "done",
+                }
+              preview_dataset:
+                {
+                  id: "IMP-DAT-PRE-001",
+                  story: "User previews dataset contents",
+                  status: "done",
+                }
+              view_dataset_errors:
+                {
+                  id: "IMP-DAT-ERR-001",
+                  story: "User views dataset errors",
+                  status: "done",
+                }
+              delete_dataset:
+                {
+                  id: "IMP-DAT-DEL-001",
+                  story: "Admin deletes dataset",
+                  status: "done",
+                }
+              set_dataset_inactive:
+                {
+                  id: "IMP-DAT-INA-001",
+                  story: "System sets dataset to inactive",
+                  status: "done",
+                }
+              activate_dataset:
+                {
+                  id: "IMP-DAT-ACT-001",
+                  story: "Admin activates dataset",
+                  status: "done",
+                }
+              deactivate_dataset:
+                {
+                  id: "IMP-DAT-DEA-001",
+                  story: "Admin deactivates dataset",
+                  status: "done",
+                }
+      data_extraction:
+        features:
+          extract_products:
+            slices:
+              extract_products:
+                {
+                  id: "IMP-EXT-RUN-001",
+                  story: "System extracts products from dataset",
+                  status: "done",
+                }
+              deactivate_old_products:
+                {
+                  id: "SUP-EXT-DED-001",
+                  story: "System deactivates old product versions",
+                  status: "planned",
+                }
+              detect_master_products:
+                {
+                  id: "SUP-EXT-MAS-001",
+                  story: "System detects master products",
+                  status: "planned",
+                }
+              detect_brand:
+                {
+                  id: "SUP-EXT-BRA-001",
+                  story: "System detects product brand",
+                  status: "planned",
+                }
+              detect_category:
+                {
+                  id: "SUP-EXT-CAT-001",
+                  story: "System detects product category",
+                  status: "planned",
+                }
+      job_monitoring:
+        features:
+          background_jobs:
+            slices:
+              get_active_jobs:
+                {
+                  id: "IMP-MON-ACT-001",
+                  story: "User monitors active background jobs",
+                  status: "in_progress",
+                }
+              create_job:
+                {
+                  id: "IMP-MON-CRE-001",
+                  story: "System creates background job record",
+                  status: "planned",
+                }
+              update_job_progress:
+                {
+                  id: "IMP-MON-UPD-001",
+                  story: "System updates job progress",
+                  status: "planned",
+                }
+              complete_job:
+                {
+                  id: "IMP-MON-COM-001",
+                  story: "System marks job as completed",
+                  status: "planned",
+                }
+              fail_job:
+                {
+                  id: "IMP-MON-FAL-001",
+                  story: "System marks job as failed",
+                  status: "planned",
+                }
+              list_job_history:
+                {
+                  id: "IMP-MON-HIS-001",
+                  story: "User views job history",
+                  status: "planned",
+                }
+
+  # ============================================================================
+  # CATALOG DOMAIN - Browse & Search Supplier Products
+  # ============================================================================
+  catalog:
+    description: "Browse and search supplier products (leveranciersassortiment)"
+    status: "done"
+    epics:
+      search:
+        features:
+          full_text_search:
+            slices:
+              search_products:
+                {
+                  id: "CAT-SEARCH-FULL-001",
+                  story: "User searches products by name/brand",
+                  status: "planned",
+                }
+              search_by_ean:
+                {
+                  id: "CAT-SEARCH-EAN-002",
+                  story: "User searches by EAN barcode",
+                  status: "planned",
+                }
+              advanced_search:
+                {
+                  id: "CAT-SEARCH-ADV-003",
+                  story: "User combines search with filters",
+                  status: "planned",
+                }
+      browse:
+        features:
+          product_listing:
+            slices:
+              list_all_products:
+                {
+                  id: "CAT-BROWSE-LIST-001",
+                  story: "User browses all products",
+                  status: "planned",
+                }
+              browse_by_supplier:
+                {
+                  id: "CAT-BROWSE-SUPP-002",
+                  story: "User browses by supplier",
+                  status: "planned",
+                }
+              browse_by_brand:
+                {
+                  id: "CAT-BROWSE-BRAND-003",
+                  story: "User browses by brand",
+                  status: "planned",
+                }
+              brand_tabs:
+                {
+                  id: "CAT-BROWSE-TABS-004",
+                  story: "User switches brands via tabs",
+                  status: "planned",
+                }
+      master_variant:
+        features:
+          variant_navigation:
+            slices:
+              get_master_detail:
+                {
+                  id: "CAT-MASTER-DETAIL-001",
+                  story: "User views master with variants",
+                  status: "planned",
+                }
+              expandable_cards:
+                {
+                  id: "CAT-MASTER-COLLAPSE-002",
+                  story: "User expands card to see variants",
+                  status: "planned",
+                }
+              group_by_color_size:
+                {
+                  id: "CAT-MASTER-GROUP-003",
+                  story: "Variants grouped by color then size",
+                  status: "planned",
+                }
+      filters:
+        features:
+          product_filtering:
+            slices:
+              filter_by_color:
+                {
+                  id: "CAT-FILTER-COLOR-001",
+                  story: "User filters by color",
+                  status: "planned",
+                }
+              filter_by_size:
+                {
+                  id: "CAT-FILTER-SIZE-002",
+                  story: "User filters by size",
+                  status: "planned",
+                }
+              clear_filters:
+                {
+                  id: "CAT-FILTER-CLEAR-003",
+                  story: "User clears all filters",
+                  status: "planned",
+                }
+              dynamic_filter_counts:
+                {
+                  id: "CAT-FILTER-COUNTS-004",
+                  story: "Filter options show counts",
+                  status: "planned",
+                }
+      pagination:
+        features:
+          pagination_modes:
+            slices:
+              infinite_scroll:
+                {
+                  id: "CAT-PAGE-INFINITE-001",
+                  story: "Products load on scroll",
+                  status: "planned",
+                }
+              traditional_pagination:
+                {
+                  id: "CAT-PAGE-OFFSET-002",
+                  story: "User navigates by page number",
+                  status: "planned",
+                }
+              view_mode_toggle:
+                {
+                  id: "CAT-PAGE-VIEW-003",
+                  story: "User switches grid/list view",
+                  status: "planned",
+                }
+
+  # ============================================================================
+  # PROMOTION DOMAIN - Select from Catalog (Phase 5)
+  # ============================================================================
+  # 🎯 MVP HAPPY PATH - See MVP_HAPPY_PATH.md Dag 2
+  # 📄 Requirements: .ai/project/PROMOTION_REQUIREMENTS.md
+  # 📊 Implementation: backend/src/domains/assortment/{services,routers,schemas}/
+  promotion:
+    description: "Promote supplier products to own assortment"
+    status: "in-progress"
+    phase: 5
+    implementation:
+      service: "backend/src/domains/assortment/services/promotion_service.py"
+      router: "backend/src/domains/assortment/routers/promotion_router.py"
+      schemas: "backend/src/domains/assortment/schemas/promotion_schemas.py"
+      tests: "backend/tests/domains/assortment/test_promotion_service.py"
+      requirements_doc: ".ai/project/PROMOTION_REQUIREMENTS.md"
+    epics:
+      promotion_backend:
+        features:
+          promotion_service:
+            slices:
+              service_logic:
+                {
+                  id: "PRO-SVC-001",
+                  story: "PromotionService promotes master + all variants to assortment",
+                  status: "done",
+                  dod: "Service promotes product, validates duplicates, creates traceability",
+                }
+              api_endpoints:
+                {
+                  id: "PRO-API-001",
+                  story: "POST /api/v1/assortment/promotion/promote endpoint",
+                  status: "done",
+                  dod: "Endpoint registered, returns 201 Created, handles 404/409 errors",
+                }
+              promotion_status:
+                {
+                  id: "PRO-API-002",
+                  story: "GET /api/v1/assortment/promotion/status/{id} checks if promoted",
+                  status: "done",
+                  dod: "Returns is_promoted boolean and assortment_master_id",
+                }
+              service_tests:
+                {
+                  id: "PRO-TST-001",
+                  story: "Unit tests for PromotionService",
+                  status: "done",
+                  dod: "14 test cases covering success, duplicates, EAN conflicts, normalization",
+                }
+      promotion_frontend:
+        features:
+          star_visualization:
+            slices:
+              promotion_status_component:
+                {
+                  id: "PRO-UI-001",
+                  story: "Show ★ (promoted) or ☆ (not promoted) in catalog",
+                  status: "planned",
+                  dod: "PromotionStatus component shows star icon, integrates in ProductCard",
+                  notes: "Backend API ready (GET /promotion/status/{id}), needs UI integration",
+                }
+              promote_button:
+                {
+                  id: "PRO-UI-002",
+                  story: "Promoveer button opens promotion preview",
+                  status: "planned",
+                  dod: "Button triggers promotion workflow, handles loading states",
+                  notes: "Backend ready (POST /promote), needs UI button in catalog browse",
+                }
+          promotion_preview:
+            slices:
+              simple_mode:
+                {
+                  id: "PRO-PRV-001",
+                  story: "Simple promotion preview (quick accept)",
+                  status: "planned",
+                  dod: "Shows brand, category, variant count, Accept/Adjust buttons",
+                }
+              detailed_mode:
+                {
+                  id: "PRO-PRV-002",
+                  story: "Detailed promotion preview (full transparency)",
+                  status: "planned",
+                  dod: "Shows AI prompt, dataset info, field values, confidence scores",
+                }
+      product_selection:
+        features:
+          browse_and_select:
+            slices:
+              select_for_promotion:
+                {
+                  id: "PRO-SEL-ADD-001",
+                  story: "User selects product for promotion",
+                  status: "planned",
+                  notes: "Backend API complete, UI button in catalog browse page not implemented",
+                }
+              view_promotion_queue:
+                {
+                  id: "PRO-SEL-QUE-001",
+                  story: "User views promotion queue",
+                  status: "planned",
+                }
+
+  # ============================================================================
+  # ASSORTMENT DOMAIN - Own Products (Phase 6)
+  # ===STATUS UPDATE: December 21, 2025
+  # ✅ Backend API: 100% DONE (assortment_router.py, assortment_service.py)
+  # ✅ Database: 100% DONE (3 tables with all constraints and indexes)
+  # ✅ Tests: 100% DONE (13 CRUD tests + model tests + integration tests)
+  # ✅ Frontend List: 90% DONE (AssortimentPage, grid, filters, detail modal)
+  # ❌ Frontend Edit: NOT IMPLEMENTED (inline edit in detail modal)
+  #
+  # MVP HAPPY PATH - See MVP_HAPPY_PATH.md for implementation details
+  # 📊 Database: assortment_masters, assortment_variants, assortment_master_sources
+  # 📄 Models: backend/src/domains/assortment/models.py
+  # 📝 Spec: .ai/project/DATABASE_MODEL_PROPOSAL_OWN_ASSORTMENT.md
+  assortment:
+    description: "Manage own Master/Variant products"
+    status: "mostly-done"  # Backend 100%, Frontend List 90%, Frontend Edit 0%own Master/Variant products"
+    status: "in-progress"
+    phase: 6
+    implementation:
+      database_migration: "20251220_create_assortment_tables.py"
+      models_file: "backend/src/domains/assortment/models.py"
+      specification: ".ai/project/DATABASE_MODEL_PROPOSAL_OWN_ASSORTMENT.md"
+      tables:
+        - name: "assortment_masters"
+          purpose: "Business product masters"
+          key_fields: "name, brand_id, category_id, promoted_by"
+        - name: "assortment_variants"
+          purpose: "Product variants (color/size)"
+          key_fields: "ean (UNIQUE), color_code, size_code, color_raw, size_raw"
+        - name: "assortment_master_sources"
+          purpose: "Multi-supplier traceability junction"
+          key_fields: "assortment_master_id, supplier_id, is_primary"
+    epics:
+      database_foundation:
+        features:
+          schema_implementation:
+            slices:
+              create_tables:
+                {
+                  id: "ASS-DB-TAB-001",
+                  story: "Database migration creates assortment tables",
+                  status: "done",
+                  dod: "Migration runs successfully, tables exist with all constraints",
+                }
+              create_models:
+                {
+                  id: "ASS-DB-MOD-001",
+                  story: "SQLAlchemy models for assortment domain",
+                  status: "done",
+                  dod: "Models defined with relationships, imported in __init__.py",
+                }
+      master_management:
+        features:
+          master_crud:
+            slices:
+              list_masters:
+                {
+                  id: "ASS-MAS-LST-001",
+                  story: "GET /api/v1/assortment/products - List with pagination/filters",
+                  status: "done",
+                  dod: "Endpoint returns paginated list, supports search, brand, category filters",
+                }
+              view_master:
+                {
+                  id: "ASS-MAS-VIW-001",
+                  story: "GET /api/v1/assortment/products/{id} - Get detail with variants",
+                  status: "done",
+                  dod: "Returns master with all variants, source links, brand/category names",
+                }
+              update_master:
+                {
+                  id: "ASS-MAS-UPD-001",
+                  story: "PUT /api/v1/assortment/products/{id} - Update product",
+                  status: "done",
+                  dod: "Updates name, description, is_active fields, returns updated detail",
+                }
+              delete_master:
+                {
+                  id: "ASS-MAS-DEL-001",
+                  story: "DELETE /api/v1/assortment/products/{id} - Soft delete",
+                  status: "done",
+                  dod: "Sets is_active=False on master and all variants, returns 204",
+                }
+              crud_tests:
+                {
+                  id: "ASS-MAS-TST-001",
+                  story: "Tests for AssortmentService CRUD operations",
+                  status: "done",
+                  dod: "13 test cases covering list, pagination, filters, detail, update, delete",
+                }
+      variant_management:
+        features:
+          variant_crud:
+            slices:
+              list_variants:
+                {
+                  id: "ASS-VAR-LST-001",
+                  story: "User views variants for master",
+                  status: "planned",
+                }
+      product_lifecycle:
+        features:
+          status_management:
+            slices:
+              deactivate_product:
+                {
+                  id: "ASS-LIF-DEA-001",
+                  story: "User deactivates product",
+                  status: "planned",
+                }
+      assortment_frontend:
+        features:
+          product_list_view:
+            slices:
+              assortment_page:
+                {
+                  id: "ASS-UI-PAGE-001",
+                  story: "Main assortment page with grid view and filters",
+                  status: "done",
+                  dod: "Page shows product grid, search, active filter, pagination",
+                }
+              product_card:
+                {
+                  id: "ASS-UI-CARD-001",
+                  story: "AssortmentProductCard component displays product summary",
+                  status: "done",
+                  dod: "Card shows name, brand, category, promoted status, variant count",
+                }
+              product_grid:
+                {
+                  id: "ASS-UI-GRID-001",
+                  story: "AssortmentProductGrid with pagination and loading states",
+                  status: "done",
+                  dod: "Grid handles loading, empty states, pagination, filter updates",
+                }
+          product_detail_view:
+            slices:
+              detail_modal:
+                {
+                  id: "ASS-UI-DETAIL-001",
+                  story: "AssortmentDetailModal for viewing and editing product",
+                  status: "done",
+                  dod: "Modal shows full product detail, variants list, edit capability",
+                }
+              inline_edit:
+                {
+                  id: "ASS-UI-EDIT-001",
+                  story: "Inline edit mode for name, description, is_active",
+                  status: "done",
+                  dod: "Edit mode with save/cancel, calls update API, refreshes cache",
+                }
+              soft_delete:
+                {
+                  id: "ASS-UI-DELETE-001",
+                  story: "Soft delete button with confirmation",
+                  status: "done",
+                  dod: "Delete button calls API, shows confirmation, closes modal on success",
+                }
+          navigation:
+            slices:
+              menu_item:
+                {
+                  id: "ASS-UI-NAV-001",
+                  story: "Assortiment menu item in sidebar navigation",
+                  status: "done",
+                  dod: "Menu item visible in Producten zone, navigates to /products/assortiment",
+                }
+              routing:
+                {
+                  id: "ASS-UI-ROUTE-001",
+                  story: "Route configuration for /products/assortiment",
+                  status: "done",
+                  dod: "Route registered in App.tsx, accessible when authenticated",
+                }
+
+  # ============================================================================
+  # ENRICHMENT DOMAIN - Add Value (Phase 7)
+  # ============================================================================
+  enrichment:
+    description: "Enrich products with prices and external links"
+    status: "planned"
+    phase: 7
+    epics:
+      pricing:
+        features:
+          price_management:
+            slices:
+              set_purchase_price:
+                {
+                  id: "ENR-PRC-PUR-001",
+                  story: "User sets purchase price",
+                  status: "planned",
+                }
+              set_sales_price:
+                {
+                  id: "ENR-PRC-SAL-001",
+                  story: "User sets sales price",
+                  status: "planned",
+                }
+      external_mapping:
+        features:
+          external_ids:
+            slices:
+              set_gripp_number:
+                {
+                  id: "ENR-EXT-GRP-001",
+                  story: "User links product to Gripp",
+                  status: "planned",
+                }
+              set_calculate_number:
+                {
+                  id: "ENR-EXT-CAL-001",
+                  story: "User links product to Calculate",
+                  status: "planned",
+                }
+
+  # ============================================================================
+  # EXPORT DOMAIN - Output (Phase 8)
+  # ============================================================================
+  export:
+    description: "Export products to external channels"
+    status: "planned"
+    phase: 8
+    epics:
+      channel_management:
+        features:
+          channel_crud:
+            slices:
+              list_channels:
+                {
+                  id: "EXP-CHN-LST-001",
+                  story: "User views export channels",
+                  status: "planned",
+                }
+      export_templates:
+        features:
+          template_management:
+            slices:
+              list_templates:
+                {
+                  id: "EXP-TPL-LST-001",
+                  story: "User views export templates",
+                  status: "planned",
+                }
+      export_execution:
+        features:
+          run_export:
+            slices:
+              export_to_channel:
+                {
+                  id: "EXP-RUN-EXP-001",
+                  story: "User exports to channel",
+                  status: "planned",
+                }
+
+  # ============================================================================
+  # MAINTENANCE DOMAIN - Master Data (Support)
+  # ============================================================================
+  maintenance:
+    description: "Master data management (suppliers, brands, categories, colors, sizes)"
+    status: "partial"
+    notes: "Master data used by workflow phases. Categories used at promotion (Phase 5)."
+    epics:
+      supplier_management:
+        features:
+          supplier_crud:
+            slices:
+              supplier_crud_endpoints:
+                {
+                  id: "MNT-SUP-CRD-001",
+                  story: "Admin manages suppliers",
+                  status: "done",
+                }
+              supplier_smart_delete:
+                {
+                  id: "MNT-SUP-DEL-001",
+                  story: "Smart delete for suppliers",
+                  status: "done",
+                }
+      brand_management:
+        features:
+          brand_crud:
+            slices:
+              brand_crud_endpoints:
+                {
+                  id: "MNT-BRD-CRD-001",
+                  story: "Admin manages brands",
+                  status: "done",
+                }
+      category_management:
+        notes: "Categories for product classification - used at promotion phase"
+        features:
+          category_hierarchy:
+            slices:
+              list_categories:
+                {
+                  id: "MNT-CAT-LIST-001",
+                  story: "Admin views category tree",
+                  status: "done",
+                }
+              get_category:
+                {
+                  id: "MNT-CAT-GET-001",
+                  story: "Admin views category details",
+                  status: "done",
+                }
+              create_category:
+                {
+                  id: "MNT-CAT-CRE-001",
+                  story: "Admin creates category",
+                  status: "done",
+                }
+              update_category:
+                {
+                  id: "MNT-CAT-UPD-001",
+                  story: "Admin updates category",
+                  status: "done",
+                }
+              delete_category:
+                {
+                  id: "MNT-CAT-DEL-001",
+                  story: "Admin deletes category",
+                  status: "done",
+                }
+              reorder_categories:
+                {
+                  id: "MNT-CAT-REORDER-001",
+                  story: "Admin reorders categories",
+                  status: "done",
+                }
+              move_subtree:
+                {
+                  id: "MNT-CAT-MOVE-001",
+                  story: "Admin moves category subtree",
+                  status: "done",
+                }
+              search_categories:
+                {
+                  id: "MNT-CAT-SEARCH-001",
+                  story: "Admin searches categories",
+                  status: "done",
+                }
+          category_bulk_ops:
+            slices:
+              bulk_import:
+                {
+                  id: "MNT-CAT-BULK-001",
+                  story: "Admin imports categories from CSV",
+                  status: "planned",
+                }
+      color_management:
+        features:
+          color_crud:
+            slices:
+              list_colors:
+                {
+                  id: "MNT-COL-LST-001",
+                  story: "User views standard colors (2405 color reference)",
+                  status: "done",
+                }
+              create_color:
+                {
+                  id: "MNT-COL-CRE-001",
+                  story: "Admin creates new color",
+                  status: "done",
+                }
+              update_color:
+                {
+                  id: "MNT-COL-UPD-001",
+                  story: "Admin updates color",
+                  status: "done",
+                }
+              delete_color:
+                {
+                  id: "MNT-COL-DEL-001",
+                  story: "Admin deletes color",
+                  status: "done",
+                }
+              get_color_families:
+                {
+                  id: "MNT-COL-FAM-001",
+                  story: "System returns available color families",
+                  status: "done",
+                }
+      size_management:
+        features:
+          size_crud:
+            slices:
+              list_sizes:
+                {
+                  id: "MNT-SIZ-LST-001",
+                  story: "User views standard sizes (185 size reference)",
+                  status: "done",
+                }
+              create_size:
+                {
+                  id: "MNT-SIZ-CRE-001",
+                  story: "Admin creates new size",
+                  status: "done",
+                }
+              update_size:
+                {
+                  id: "MNT-SIZ-UPD-001",
+                  story: "Admin updates size",
+                  status: "done",
+                }
+              delete_size:
+                {
+                  id: "MNT-SIZ-DEL-001",
+                  story: "Admin deletes size",
+                  status: "done",
+                }
+              get_size_categories:
+                {
+                  id: "MNT-SIZ-CAT-001",
+                  story: "System returns available size categories",
+                  status: "done",
+                }
+
+  # ============================================================================
+  # SYSTEM DOMAIN - AI & Configuration (Support)
+  # ============================================================================
+  system:
+    description: "System-wide configuration and AI providers"
+    status: "done"
+    epics:
+      ai_integration:
+        features:
+          ai_configuration:
+            slices:
+              list_providers:
+                {
+                  id: "SYS-AI-LST-001",
+                  story: "Admin views AI providers",
+                  status: "done",
+                }
+              configure_provider:
+                {
+                  id: "SYS-AI-CFG-001",
+                  story: "Admin configures AI provider",
+                  status: "done",
+                }
+              activate_provider:
+                {
+                  id: "SYS-AI-ACT-001",
+                  story: "Admin activates AI provider",
+                  status: "done",
+                }
+              test_connection:
+                {
+                  id: "SYS-AI-TST-001",
+                  story: "Admin tests AI connection",
+                  status: "done",
+                }
+              delete_provider_key:
+                {
+                  id: "SYS-AI-DEL-001",
+                  story: "Admin removes API key",
+                  status: "done",
+                }
+              get_active_status:
+                {
+                  id: "SYS-AI-STA-001",
+                  story: "System gets active AI provider",
+                  status: "done",
+                }
+
+      service_orchestration:
+        description: "Service startup and health orchestration"
+        features:
+          start_services:
+            slices:
+              start_docker_and_services:
+                {
+                  id: "SYS-SRV-STA-001",
+                  story: "User starts Docker containers and backend from UI",
+                  status: "done",
+                }
+              get_services_status:
+                {
+                  id: "SYS-SRV-STT-001",
+                  story: "System gets current health of all services",
+                  status: "done",
+                }
+
+  # ============================================================================
+  # PLATFORM DOMAIN - UI Shell & Navigation (Support)
+  # ============================================================================
+  platform:
+    description: "Application shell, navigation, theme (Shadcn/ui based)"
+    status: "done"
+    epics:
+      application_shell:
+        features:
+          layout_foundation:
+            slices:
+              main_layout:
+                {
+                  id: "PLT-SHL-LAY-001",
+                  story: "User sees consistent layout",
+                  status: "done",
+                }
+              header_component:
+                {
+                  id: "PLT-SHL-HDR-001",
+                  story: "User sees header with logo/menu",
+                  status: "done",
+                }
+              sidebar_navigation:
+                {
+                  id: "PLT-SHL-SDB-001",
+                  story: "User navigates via sidebar",
+                  status: "done",
+                }
+              footer_status:
+                {
+                  id: "PLT-SHL-FTR-001",
+                  story: "User sees system status in footer",
+                  status: "done",
+                }
+          responsive_behavior:
+            slices:
+              mobile_navigation:
+                {
+                  id: "PLT-SHL-MOB-001",
+                  story: "Mobile sidebar collapses",
+                  status: "done",
+                }
+              responsive_header:
+                {
+                  id: "PLT-SHL-MOB-002",
+                  story: "Header adapts to mobile",
+                  status: "done",
+                }
+      navigation:
+        features:
+          sidebar_menu:
+            slices:
+              navigation_config:
+                {
+                  id: "PLT-NAV-CFG-001",
+                  story: "Dev manages menu config",
+                  status: "done",
+                }
+              dynamic_menu_renderer:
+                {
+                  id: "PLT-NAV-REN-001",
+                  story: "System renders menu from config",
+                  status: "done",
+                }
+          breadcrumbs:
+            slices:
+              breadcrumb_component:
+                {
+                  id: "PLT-NAV-BRC-001",
+                  story: "User sees breadcrumb trail",
+                  status: "done",
+                }
+              auto_breadcrumb_generation:
+                {
+                  id: "PLT-NAV-BRC-002",
+                  story: "Breadcrumbs auto-generate",
+                  status: "done",
+                }
+      theme_system:
+        features:
+          shadcn_integration:
+            slices:
+              shadcn_cli_setup:
+                {
+                  id: "PLT-THM-SHD-001",
+                  story: "Dev has Shadcn installed",
+                  status: "done",
+                }
+              dark_mode_config:
+                {
+                  id: "PLT-THM-DRK-001",
+                  story: "Dark mode enabled by default",
+                  status: "done",
+                }
+              design_tokens:
+                {
+                  id: "PLT-THM-TOK-001",
+                  story: "Dev uses design tokens",
+                  status: "done",
+                }
+          component_library:
+            slices:
+              base_components:
+                {
+                  id: "PLT-THM-CMP-001",
+                  story: "Dev uses base Shadcn components",
+                  status: "done",
+                }
+              composite_components:
+                {
+                  id: "PLT-THM-CMP-002",
+                  story: "Dev uses composite components",
+                  status: "done",
+                }
+      context_indicators:
+        features:
+          footer_status_bar:
+            slices:
+              connection_monitoring:
+                {
+                  id: "PLT-CTX-CON-001",
+                  story: "User sees connection status",
+                  status: "done",
+                }
+              otap_indicator:
+                {
+                  id: "PLT-CTX-OTP-001",
+                  story: "User sees environment badge",
+                  status: "done",
+                }
+              background_jobs_widget:
+                {
+                  id: "PLT-CTX-JOB-001",
+                  story: "User sees running jobs",
+                  status: "done",
+                }
+              version_display:
+                {
+                  id: "PLT-CTX-VER-001",
+                  story: "User sees app version",
+                  status: "done",
+                }
+      catalog_consolidation:
+        features:
+          unified_browse:
+            slices:
+              consolidate_catalog_features:
+                {
+                  id: "PLT-CAT-CON-001",
+                  story: "Consolidate duplicate catalog-browse implementations into single unified feature",
+                  status: "done",
+                }
+

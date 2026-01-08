@@ -1,8 +1,18 @@
+import { use } from 'react';
 import Link from 'next/link';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 
-export default function Home() {
+export default function Home({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  // Unwrap searchParams to satisfy Next.js 15 requirements
+  // Even if we don't use it, Next.js requires it to be unwrapped
+  if (searchParams) {
+    use(searchParams);
+  }
   return (
     <div className="space-y-8">
       <div>
@@ -30,7 +40,7 @@ export default function Home() {
           <p className="text-gray-600 mb-4">
             Review and track your import sessions
           </p>
-          <Link href="/sessions">
+          <Link href="/upload">
             <Button>View Sessions</Button>
           </Link>
         </Card>

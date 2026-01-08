@@ -10,11 +10,25 @@ export interface Product {
 
 export interface ImportSession {
   id?: number;
-  filename: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  total_rows: number;
+  file_name: string;
+  status: 'pending' | 'uploading' | 'parsing' | 'analyzing_ean' | 'waiting_column_selection' | 'processing' | 'approved' | 'rejected' | 'failed';
+  total_rows?: number; // Deprecated: use total_rows_in_file instead
+  total_rows_in_file?: number; // Total number of rows (productregels) in file
+  columns_count?: number; // Number of columns in file
   processed_rows: number;
   conflicts_count: number;
+  file_hash?: string;
+  file_size_bytes?: number;
+  file_storage_path?: string;
+  file_type?: 'csv' | 'xlsx';
+  uploaded_at?: string;
+  parsed_at?: string; // When file parsing was completed
+  error_message?: string;
+  // EAN analysis fields (metadata kept, but status is now unified)
+  unique_ean_count?: number; // Number of unique EAN codes in file
+  duplicate_ean_count?: number; // Number of duplicate EAN codes in file
+  detected_ean_column?: string; // Name of the detected EAN column
+  ean_analysis_at?: string; // Timestamp of EAN analysis
   created_at?: string;
   updated_at?: string;
 }

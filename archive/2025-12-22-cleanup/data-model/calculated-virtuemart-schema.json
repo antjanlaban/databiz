@@ -1,0 +1,311 @@
+{
+  "virtuemart_product": {
+    "artikelinformatie": {
+      "artikelnaam": {
+        "type": "text",
+        "required": true,
+        "beschrijving": "De naam van het product"
+      },
+      "artikel_unieke_code": {
+        "type": "text",
+        "required": false,
+        "beschrijving": "SKU of unieke productcode (bijv. EAN)"
+      },
+      "fabrikant": {
+        "type": "dropdown",
+        "required": false,
+        "opties": ["Clique", "Dassy", "FOTL", "Image Workwear", "PowerWorkwear", "Result", "Santino", "Stedman"],
+        "beschrijving": "Selecteer de fabrikant van het product"
+      },
+      "categorieen": {
+        "type": "multi-select",
+        "required": true,
+        "beschrijving": "Selecteer een of meerdere categorieën"
+      },
+      "voorkeurscategorie_forceren": {
+        "type": "dropdown",
+        "required": false,
+        "beschrijving": "Forceer een specifieke categorie als primaire categorie"
+      },
+      "ingeschakeld": {
+        "type": "checkbox",
+        "required": false,
+        "beschrijving": "Product activeren/deactiveren"
+      },
+      "als_speciaal_aanmerken": {
+        "type": "checkbox",
+        "required": false,
+        "beschrijving": "Markeer product als speciaal aanbod"
+      },
+      "niet_meer_leverbaar": {
+        "type": "checkbox",
+        "required": false,
+        "beschrijving": "Geef aan dat product niet meer leverbaar is"
+      },
+      "gtin_ean_isbn": {
+        "type": "text",
+        "required": false,
+        "beschrijving": "GTIN, EAN of ISBN nummer"
+      },
+      "pagina_artikelgegevens": {
+        "type": "dropdown",
+        "required": false,
+        "opties": ["default", "bs3-default", "notify", "bs3-notify", "multiadd"],
+        "beschrijving": "Template voor productpagina"
+      },
+      "klantengroep": {
+        "type": "multi-select",
+        "required": false,
+        "opties": ["Standaard klantgroep", "Gast klantgroep"],
+        "beschrijving": "Selecteer voor welke klantengroepen dit product beschikbaar is"
+      },
+      "artikel_alias": {
+        "type": "text",
+        "required": false,
+        "beschrijving": "SEO-vriendelijke URL alias"
+      },
+      "mpn": {
+        "type": "text",
+        "required": false,
+        "beschrijving": "Manufacturer Part Number"
+      },
+      "gegevens_url": {
+        "type": "text",
+        "required": false,
+        "beschrijving": "Externe URL voor meer productinformatie"
+      },
+      "verkoper": {
+        "type": "dropdown",
+        "required": false,
+        "beschrijving": "Selecteer verkoper voor dit product"
+      },
+      "prijzen": {
+        "kostprijs": {
+          "type": "number",
+          "required": false,
+          "beschrijving": "Inkoopprijs van het product"
+        },
+        "basisprijs_punten": {
+          "type": "number",
+          "required": false,
+          "beschrijving": "Basisprijs in punten"
+        },
+        "uiteindelijke_prijs_punten": {
+          "type": "number",
+          "required": true,
+          "beschrijving": "Verkoopprijs in punten"
+        }
+      },
+      "subartikel": {
+        "hoofdartikel_id": {
+          "type": "number",
+          "required": false,
+          "beschrijving": "ID van hoofdartikel als dit een variant is"
+        }
+      },
+      "interne_notitie": {
+        "type": "textarea",
+        "required": false,
+        "beschrijving": "Interne notities (niet zichtbaar voor klanten)"
+      }
+    },
+    "artikelomschrijving": {
+      "korte_omschrijving": {
+        "type": "textarea",
+        "required": false,
+        "beschrijving": "Korte productomschrijving (zichtbaar in lijsten)"
+      },
+      "artikelomschrijving": {
+        "type": "wysiwyg",
+        "required": false,
+        "beschrijving": "Uitgebreide productbeschrijving met opmaak"
+      }
+    },
+    "artikelstatus": {
+      "voorraad": {
+        "op_voorraad": {
+          "type": "number",
+          "required": false,
+          "default": 0,
+          "beschrijving": "Aantal stuks op voorraad"
+        },
+        "minimale_voorraad": {
+          "type": "number",
+          "required": false,
+          "default": 0,
+          "beschrijving": "Minimum voorraadniveau voor waarschuwing"
+        },
+        "geboekt_besteld": {
+          "type": "number",
+          "required": false,
+          "default": 0,
+          "beschrijving": "Aantal reeds geboekt/besteld"
+        }
+      },
+      "beschikbaarheidsdatum": {
+        "type": "date",
+        "required": false,
+        "beschrijving": "Datum vanaf wanneer product beschikbaar is"
+      },
+      "beschikbaarheid": {
+        "type": "text",
+        "required": false,
+        "beschrijving": "Beschikbaarheidstekst"
+      },
+      "beschikbaarheidsafbeelding": {
+        "type": "dropdown",
+        "required": false,
+        "beschrijving": "Selecteer afbeelding voor beschikbaarheidsstatus"
+      },
+      "aankoop_hoeveelheid": {
+        "stappen_aankoophoeveelheid": {
+          "type": "number",
+          "required": false,
+          "beschrijving": "In welke stappen kan product gekocht worden"
+        },
+        "minimale_aankoophoeveelheid": {
+          "type": "number",
+          "required": false,
+          "beschrijving": "Minimum aantal per bestelling"
+        },
+        "maximale_aankoophoeveelheid": {
+          "type": "number",
+          "required": false,
+          "beschrijving": "Maximum aantal per bestelling"
+        }
+      },
+      "email_notificatie": {
+        "stuur_email_aan_klanten": {
+          "type": "checkbox",
+          "required": false,
+          "beschrijving": "Stuur email notificatie naar klanten"
+        },
+        "email_onderwerp": {
+          "type": "text",
+          "required": false,
+          "beschrijving": "Onderwerp van de email"
+        },
+        "email_inhoud": {
+          "type": "textarea",
+          "required": false,
+          "beschrijving": "Inhoud van de notificatie email"
+        }
+      }
+    },
+    "artikel_maten_en_gewichten": {
+      "afmetingen": {
+        "lengte_artikel": {
+          "type": "number",
+          "required": false,
+          "eenheid": "dropdown",
+          "eenheid_opties": ["Meter", "Centimeter", "Millimeter"],
+          "beschrijving": "Lengte van het product"
+        },
+        "artikelbreedte": {
+          "type": "number",
+          "required": false,
+          "eenheid": "dropdown",
+          "eenheid_opties": ["Meter", "Centimeter", "Millimeter"],
+          "beschrijving": "Breedte van het product"
+        },
+        "hoogte_artikel": {
+          "type": "number",
+          "required": false,
+          "eenheid": "dropdown",
+          "eenheid_opties": ["Meter", "Centimeter", "Millimeter"],
+          "beschrijving": "Hoogte van het product"
+        }
+      },
+      "gewicht": {
+        "artikelgewicht": {
+          "type": "number",
+          "required": false,
+          "default": "0.0000",
+          "eenheid": "dropdown",
+          "eenheid_opties": ["KG", "G", "LB"],
+          "beschrijving": "Gewicht van het product"
+        },
+        "verpakking_artikel": {
+          "type": "number",
+          "required": false,
+          "default": "0.0000",
+          "eenheid": "dropdown",
+          "eenheid_opties": ["kg", "g", "lb"],
+          "beschrijving": "Verpakkingseenheid"
+        }
+      },
+      "eenheden_in_een_doos": {
+        "type": "number",
+        "required": false,
+        "beschrijving": "Aantal producten per doos"
+      }
+    },
+    "artikelafbeeldingen": {
+      "afbeeldingen": {
+        "type": "file_upload",
+        "required": false,
+        "beschrijving": "Upload productafbeeldingen",
+        "zoekfunctie": true,
+        "opties": [
+          "Afbeelding uploaden",
+          "Zoeken in bestaande afbeeldingen",
+          "Afbeeldingen sorteren",
+          "Afbeelding verwijderen"
+        ]
+      },
+      "afbeeldingsinformatie": {
+        "type": "metadata",
+        "beschrijving": "Extra informatie per afbeelding (alt-tekst, titel, etc.)"
+      }
+    },
+    "speciale_velden": {
+      "verwante_categorieen": {
+        "type": "search_select",
+        "required": false,
+        "beschrijving": "Koppel gerelateerde categorieën aan dit product"
+      },
+      "verwante_artikelen": {
+        "type": "search_select",
+        "required": false,
+        "beschrijving": "Koppel gerelateerde producten (cross-sell/up-sell)"
+      },
+      "soort_veld": {
+        "type": "dropdown",
+        "required": false,
+        "beschrijving": "Selecteer custom velden type",
+        "voorbeeld": "Maat"
+      },
+      "custom_fields": {
+        "type": "dynamic",
+        "required": false,
+        "beschrijving": "Aangepaste velden zoals maat, kleur, etc.",
+        "velden": {
+          "punten": {
+            "type": "number",
+            "beschrijving": "Prijsaanpassing in punten"
+          },
+          "waarde": {
+            "type": "text",
+            "beschrijving": "Waarde van het custom veld (bijv. S, M, L)"
+          },
+          "artikelnummer": {
+            "type": "text",
+            "beschrijving": "Specifiek artikelnummer voor deze variant"
+          }
+        }
+      }
+    },
+    "algemeen": {
+      "product_id": {
+        "type": "number",
+        "readonly": true,
+        "beschrijving": "Automatisch gegenereerd product ID"
+      },
+      "taal": {
+        "type": "language_selector",
+        "default": "Nederlands (nl-NL)",
+        "beschrijving": "Taal van productinformatie"
+      }
+    }
+  }
+}

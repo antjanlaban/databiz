@@ -1,0 +1,103 @@
+# Document Hierarchy (Conflict Resolution)
+
+# When documents conflict, higher precedence wins.
+# Read documents in order from top to bottom.
+
+precedence:
+  # Level 1: Entry Point (routing only)
+  - path: .github/copilot-instructions.md
+    purpose: Routing to other documents
+    authority: AI-DIRECTOR
+    note: Keep under 150 lines, link to details
+
+  # Level 2: Critical Rules (override all others)
+  - path: .ai/project/OTAP_ENFORCEMENT.md
+    purpose: Git branch rules, deployment flow
+    authority: AI-DIRECTOR + DEVOPS
+    note: If this says X, ignore other documents about git
+
+  - path: .ai/project/DOMAIN_REGISTRY.yaml
+    purpose: Slice definitions (THE LAW)
+    authority: ORCHESTRATOR
+    note: No registry entry = no code allowed
+
+  # Level 3: Company Standards
+  - path: .ai/company/BUSINESS_SYSTEM.md
+    purpose: Tech stack, business rules
+    authority: AI-DIRECTOR
+    note: Non-negotiable stack choices
+
+  - path: .ai/company/DDD_GUIDE.md
+    purpose: Architecture patterns
+    authority: ARCHITECT
+    note: Domain > Epic > Feature > Slice
+
+  - path: .ai/company/AGENT_TASKING_PROTOCOL.md
+    purpose: Anti-hallucination rules
+    authority: AI-DIRECTOR
+    note: Must verify before coding
+
+  # Level 4: Project-Specific Configuration
+  - path: .ai/project/ACTIVE_CONTEXT.md
+    purpose: Current sprint status
+    authority: ORCHESTRATOR
+    note: Updated per sprint/session
+
+  - path: .ai/project/WORKTREE_MASTER.md
+    purpose: Worktree isolation rules
+    authority: DEVOPS
+    note: Consolidated from GUIDELINES + PLAYBOOK
+
+  - path: .ai/project/PORT_REGISTRY.yaml
+    purpose: Port allocations
+    authority: DEVOPS
+    note: No port conflicts allowed
+
+  # Level 5: Reference Documentation
+  - path: .github/copilot/TECH_QUICK_REF.md
+    purpose: Commands, ports, quick lookup
+    authority: AI-DIRECTOR
+    note: Extracted from copilot-instructions.md
+
+  - path: .github/copilot/WORKFLOW_RULES.md
+    purpose: Development workflow
+    authority: AI-DIRECTOR
+    note: Extracted from copilot-instructions.md
+
+  - path: .github/copilot/ROLE_TRIGGERS.md
+    purpose: Agent persona triggers
+    authority: AI-DIRECTOR
+    note: Links to .ai/company/agent-library/
+
+# Conflict Resolution Rules
+conflict_resolution:
+  - rule: OTAP_ENFORCEMENT always wins for git operations
+  - rule: DOMAIN_REGISTRY always wins for slice existence
+  - rule: BUSINESS_SYSTEM always wins for tech stack choices
+  - rule: Worktree WORKTREE.md overrides general rules within that worktree
+  - rule: When in doubt, ask AI-DIRECTOR for clarification
+
+# Quick Decision Tree
+decision_tree:
+  git_operations: .ai/project/OTAP_ENFORCEMENT.md
+  which_slice: .ai/project/DOMAIN_REGISTRY.yaml
+  tech_stack: .ai/company/BUSINESS_SYSTEM.md
+  architecture: .ai/company/DDD_GUIDE.md
+  current_sprint: .ai/project/ACTIVE_CONTEXT.md
+  worktree_rules: .ai/project/WORKTREE_MASTER.md
+  port_allocation: .ai/project/PORT_REGISTRY.yaml
+
+# Deprecated Documents (archived, do not reference)
+deprecated:
+  - path: .ai/project/WORKTREE_GUIDELINES.md
+    replaced_by: .ai/project/WORKTREE_MASTER.md
+  - path: .ai/project/WORKTREE_PLAYBOOK.md
+    replaced_by: .ai/project/WORKTREE_MASTER.md
+  - path: .github/copilot-instructions-old.md
+    replaced_by: .github/copilot-instructions.md (modular version)
+
+# Maintenance
+maintenance:
+  last_updated: 2025-12-18
+  updated_by: AI-DIRECTOR
+  review_schedule: Monthly or on major architecture changes

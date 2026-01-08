@@ -16,13 +16,7 @@ export default function Navigation() {
               href="/upload" 
               className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
             >
-              Upload
-            </Link>
-            <Link 
-              href="/sessions" 
-              className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            >
-              Import Sessions
+              Leveranciersimport
             </Link>
             <Link 
               href="/conflicts" 

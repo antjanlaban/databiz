@@ -13,11 +13,22 @@ export interface ParseResult {
   errors: string[];
 }
 
-export const parseCSV = (file: File): Promise<ParseResult> => {
+export interface ParseMetadata {
+  rowCount: number;
+  columnCount: number;
+}
+
+export const parseCSV = async (file: File): Promise<ParseResult> => {
+  // CRITICAL: Read file as text first to avoid FileReaderSync error in Node.js
+  // PapaParse with File objects tries to use FileReaderSync which is not available server-side
+  const csvText = await file.text();
+  
   return new Promise((resolve) => {
-    Papa.parse(file, {
+    // Use text string instead of File object to avoid FileReaderSync issues
+    Papa.parse(csvText, {
       header: true,
       skipEmptyLines: true,
+      worker: false, // Disable worker to avoid FileReaderSync error in Node.js
       complete: (results) => {
         const errors: string[] = [];
         const data: ParsedProduct[] = [];
@@ -163,3 +174,272 @@ export const parseFile = async (file: File): Promise<ParseResult> => {
     };
   }
 };
+
+/**
+ * Get file metadata (row count and column count) without full parsing
+ * @param file File to analyze
+ * @returns ParseMetadata with rowCount and columnCount
+ * @throws Error if file cannot be parsed
+ */
+export async function getFileMetadata(file: File): Promise<ParseMetadata> {
+  const extension = file.name.split('.').pop()?.toLowerCase();
+
+  if (extension === 'csv') {
+    return getCSVMetadata(file);
+  } else if (extension === 'xlsx' || extension === 'xls') {
+    return getExcelMetadata(file);
+  } else {
+    throw new Error('Unsupported file format. Please upload CSV or Excel files.');
+  }
+}
+
+/**
+ * Get CSV file metadata (row and column counts)
+ * @param file CSV file
+ * @returns ParseMetadata
+ */
+async function getCSVMetadata(file: File): Promise<ParseMetadata> {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileParser.ts:195',message:'Starting CSV metadata extraction',data:{fileName:file.name,fileSize:file.size,fileType:file.type},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H5'})}).catch(()=>{});
+  // #endregion
+  console.log('[FileParser] Starting CSV metadata extraction:', {
+    fileName: file.name,
+    fileSize: file.size,
+    fileType: file.type
+  });
+
+  // Read file as text first to avoid FileReaderSync issue in Node.js
+  // FileReaderSync is browser-only and not available in server-side context
+  const text = await file.text();
+  
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileParser.ts:202',message:'File read as text',data:{fileName:file.name,textLength:text.length,firstChars:text.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H5'})}).catch(()=>{});
+  // #endregion
+
+  return new Promise((resolve, reject) => {
+    let rowCount = 0;
+    let columnCount = 0;
+    let firstRowProcessed = false;
+
+    Papa.parse(text, {
+      header: false,
+      skipEmptyLines: true,
+      encoding: 'UTF-8',
+      delimiter: '', // Auto-detect delimiter
+      newline: '', // Auto-detect newline
+      quoteChar: '"',
+      escapeChar: '"',
+      worker: false, // Disable worker to avoid FileReaderSync issue
+      step: (results) => {
+        if (results.data && Array.isArray(results.data)) {
+          // Check if row has any data (non-empty cells)
+          const nonEmptyCells = results.data.filter(
+            (cell) => cell !== null && cell !== undefined && cell !== ''
+          );
+
+          if (nonEmptyCells.length > 0) {
+            // First non-empty row determines column count
+            if (!firstRowProcessed) {
+              columnCount = nonEmptyCells.length;
+              firstRowProcessed = true;
+            }
+            // Count all rows with data
+            rowCount++;
+          }
+        }
+      },
+      complete: () => {
+        // Exclude header row from count (first row is usually header)
+        const dataRowCount = Math.max(0, rowCount > 0 ? rowCount - 1 : 0);
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileParser.ts:236',message:'CSV metadata extraction complete',data:{rowCount:dataRowCount,columnCount,fileName:file.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H1,H2,H3'})}).catch(()=>{});
+        // #endregion
+        
+        resolve({
+          rowCount: dataRowCount,
+          columnCount: columnCount,
+        });
+      },
+      error: (error) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileParser.ts:245',message:'CSV parsing error',data:{error:error.message,errorType:error.type,errorCode:error.code,fileName:file.name,fileSize:file.size},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H1,H2,H5,H6'})}).catch(()=>{});
+        // #endregion
+        console.error('[FileParser] CSV parsing error details:', {
+          message: error.message,
+          type: error.type,
+          code: error.code,
+          fileName: file.name,
+          fileSize: file.size,
+          error: error
+        });
+        reject(new Error(`Failed to parse CSV file: ${error.message}${error.code ? ` (code: ${error.code})` : ''}${error.type ? ` (type: ${error.type})` : ''}`));
+      },
+    });
+  });
+}
+
+/**
+ * Get Excel file metadata (row and column counts)
+ * @param file Excel file (.xlsx or .xls)
+ * @returns ParseMetadata
+ */
+async function getExcelMetadata(file: File): Promise<ParseMetadata> {
+  try {
+    const buffer = await file.arrayBuffer();
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet) {
+      throw new Error('No worksheet found in Excel file');
+    }
+
+    // Get actual row count (excluding empty rows at the end)
+    let rowCount = 0;
+    worksheet.eachRow((row, rowNumber) => {
+      // Check if row has any data
+      const hasData = row.values.some(
+        (cell, index) => index > 0 && cell !== null && cell !== undefined && cell !== ''
+      );
+      if (hasData) {
+        rowCount = rowNumber;
+      }
+    });
+
+    // Subtract 1 to exclude header row
+    const dataRowCount = Math.max(0, rowCount - 1);
+
+    // Get column count from header row (first row)
+    let columnCount = 0;
+    if (rowCount > 0) {
+      const headerRow = worksheet.getRow(1);
+      headerRow.eachCell((cell, colNumber) => {
+        if (cell.value !== null && cell.value !== undefined && cell.value !== '') {
+          columnCount = Math.max(columnCount, colNumber);
+        }
+      });
+    }
+
+    return {
+      rowCount: dataRowCount,
+      columnCount: columnCount,
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to parse Excel file: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
+ * Extract all values from a specific column in a file
+ * @param file File to extract values from
+ * @param columnName Name of the column to extract
+ * @returns Promise resolving to array of column values (as strings)
+ */
+export async function extractEANColumnValues(file: File, columnName: string): Promise<string[]> {
+  const extension = file.name.split('.').pop()?.toLowerCase();
+
+  if (extension === 'csv') {
+    return extractEANColumnValuesCSV(file, columnName);
+  } else if (extension === 'xlsx' || extension === 'xls') {
+    return extractEANColumnValuesExcel(file, columnName);
+  } else {
+    throw new Error('Unsupported file format. Please upload CSV or Excel files.');
+  }
+}
+
+/**
+ * Extract column values from CSV file
+ * Reads the file as text first to avoid FileReaderSync issues in Node.js
+ */
+async function extractEANColumnValuesCSV(file: File, columnName: string): Promise<string[]> {
+  // CRITICAL: Read file as text first to avoid FileReaderSync error in Node.js
+  // PapaParse with File objects tries to use FileReaderSync which is not available server-side
+  const csvText = await file.text();
+  
+  return new Promise((resolve, reject) => {
+    const values: string[] = [];
+
+    // Use text string instead of File object to avoid FileReaderSync issues
+    Papa.parse(csvText, {
+      header: true,
+      skipEmptyLines: true,
+      worker: false, // Disable worker to avoid FileReaderSync error in Node.js
+      step: (results) => {
+        const row = results.data as any;
+        const value = row[columnName];
+        
+        if (value !== null && value !== undefined && value !== '') {
+          // Clean the value - remove quotes and whitespace
+          const cleanedValue = String(value).trim().replace(/^["']+|["']+$/g, '').trim();
+          if (cleanedValue) {
+            values.push(cleanedValue);
+          }
+        }
+      },
+      complete: () => {
+        resolve(values);
+      },
+      error: (error) => {
+        reject(new Error(`Failed to extract column values from CSV: ${error.message}`));
+      },
+    });
+  });
+}
+
+/**
+ * Extract column values from Excel file
+ */
+async function extractEANColumnValuesExcel(file: File, columnName: string): Promise<string[]> {
+  try {
+    const buffer = await file.arrayBuffer();
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet) {
+      throw new Error('No worksheet found in Excel file');
+    }
+
+    const values: string[] = [];
+
+    // Get header row to find column index
+    const headerRow = worksheet.getRow(1);
+    let columnIndex: number | null = null;
+
+    headerRow.eachCell((cell, colNumber) => {
+      const headerName = String(cell.value).trim();
+      if (headerName === columnName) {
+        columnIndex = colNumber;
+      }
+    });
+
+    if (columnIndex === null) {
+      throw new Error(`Column "${columnName}" not found in Excel file`);
+    }
+
+    // Extract values from data rows
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // Skip header row
+
+      const cell = row.getCell(columnIndex);
+      const value = cell.value;
+
+      if (value !== null && value !== undefined && value !== '') {
+        // Clean the value - remove quotes and whitespace
+        const cleanedValue = String(value).trim().replace(/^["']+|["']+$/g, '').trim();
+        if (cleanedValue) {
+          values.push(cleanedValue);
+        }
+      }
+    });
+
+    return values;
+  } catch (error) {
+    throw new Error(
+      `Failed to extract column values from Excel: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
