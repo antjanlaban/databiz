@@ -39,3 +39,4 @@ CREATE INDEX IF NOT EXISTS idx_import_sessions_ready_for_ean_analysis
 CREATE INDEX IF NOT EXISTS idx_import_sessions_ean_analysis_at 
   ON import_sessions(ean_analysis_at);
 
+

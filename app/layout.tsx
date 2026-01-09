@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
+import Providers from "@/components/layout/Providers";
 
 export const metadata: Metadata = {
   title: "DataBiz - Product Data Import",
@@ -13,12 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="nl" className="dark">
       <body>
-        <Navigation />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Providers>
           {children}
-        </main>
+        </Providers>
       </body>
     </html>
   );

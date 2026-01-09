@@ -44,12 +44,27 @@ supabase/
 ## 🔧 Optionele Integraties
 
 ### VS Code Extension
-Settings JSON:
+
+**⚠️ Problemen met "Connection failed" foutmeldingen?**  
+Zie [TROUBLESHOOTING_SUPABASE_EXTENSION.md](../docs/TROUBLESHOOTING_SUPABASE_EXTENSION.md) voor oplossingen.
+
+**Configuratie (optioneel):**
 ```json
 {
-  "supabase.accessToken": "sbp_a9dff715a046760db07d71155d264ed2b83fcc7f",
+  "supabase.accessToken": "sbp_JOUW_TOKEN_HIER",
   "supabase.projectRef": "smpkbweozrkjalpceqwu"
 }
+```
+
+**Automatische configuratie:**
+```bash
+node scripts/setup-supabase-extension.mjs
+```
+Dit script leest `SUPABASE_ACCESS_TOKEN` uit `.env.local` en configureert de extensie automatisch.
+
+**Check configuratie:**
+```bash
+node scripts/configure-supabase-extension.mjs check
 ```
 
 ### MCP Server (AI Agents)

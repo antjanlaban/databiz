@@ -117,7 +117,7 @@ async function detectEANColumnsCSV(file: File, headers: string[]): Promise<strin
 
         resolve(eanColumns);
       },
-      error: (error) => {
+      error: (error: Error) => {
         reject(new Error(`Failed to parse CSV file for EAN detection: ${error.message}`));
       },
     });

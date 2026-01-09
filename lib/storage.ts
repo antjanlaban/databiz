@@ -9,6 +9,15 @@ import {
 } from './upload-constants';
 import { sanitizeFileName } from './fileValidation';
 
+// Re-export constants for convenience
+export { 
+  STORAGE_BUCKET_NAME,
+  STORAGE_INCOMING_FOLDER,
+  STORAGE_PROCESSING_FOLDER,
+  STORAGE_APPROVED_FOLDER,
+  STORAGE_REJECTED_FOLDER
+} from './upload-constants';
+
 /**
  * Ensure the storage bucket exists, create it if it doesn't
  * @param bucketName Name of the bucket

@@ -20,6 +20,7 @@ import { randomUUID } from 'crypto';
 // Configure timeout for large file uploads (5 minutes)
 export const maxDuration = 300; // 5 minutes
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs'; // Explicit runtime for better large file handling
 
 /**
  * POST /api/upload
@@ -29,11 +30,60 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseServer();
 
+    // Check Content-Type header (should include multipart/form-data, possibly with boundary)
+    const contentType = request.headers.get('content-type') || '';
+    console.log('[Upload] Content-Type:', contentType);
+    console.log('[Upload] Request method:', request.method);
+    console.log('[Upload] Request URL:', request.url);
+    
+    // Accept multipart/form-data with or without boundary parameter
+    if (!contentType.includes('multipart/form-data')) {
+      console.error('[Upload] Invalid Content-Type:', contentType);
+      return NextResponse.json(
+        {
+          success: false,
+          error: UploadErrorCode.FILE_NOT_PROVIDED,
+          message: `Invalid Content-Type. Expected multipart/form-data, got: ${contentType || 'none'}`,
+        },
+        { status: 400 }
+      );
+    }
+
     // Extract file from FormData
-    const formData = await request.formData();
+    // In Next.js 16, we should use the request directly, not clone it
+    // Cloning can cause issues with large files
+    let formData: FormData;
+    try {
+      // Directly parse FormData from request (Next.js handles this correctly)
+      formData = await request.formData();
+      console.log('[Upload] FormData parsed successfully');
+    } catch (error) {
+      console.error('[Upload] Failed to parse FormData:', error);
+      if (error instanceof Error) {
+        console.error('[Upload] Error details:', error.message);
+        console.error('[Upload] Error stack:', error.stack);
+      }
+      
+      // Check if body was already consumed (for debugging)
+      const bodyUsed = (request as any).bodyUsed;
+      console.error('[Upload] Request body used:', bodyUsed);
+      console.error('[Upload] Content-Type header:', contentType);
+      console.error('[Upload] Content-Length header:', request.headers.get('content-length'));
+      
+      return NextResponse.json(
+        {
+          success: false,
+          error: UploadErrorCode.FILE_NOT_PROVIDED,
+          message: `Failed to parse body as FormData: ${error instanceof Error ? error.message : String(error)}. Please ensure the file is a valid CSV or Excel file.`,
+        },
+        { status: 400 }
+      );
+    }
+    
     const file = formData.get('file') as File | null;
 
     if (!file) {
+      console.error('[Upload] No file found in FormData');
       return NextResponse.json(
         {
           success: false,
@@ -44,9 +94,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('[Upload] File received:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    });
+
     // Step 1: Validate file extension
     const extensionValidation = validateFileExtension(file);
     if (!extensionValidation.valid) {
+      console.error('[Upload] File extension validation failed:', {
+        fileName: file.name,
+        error: extensionValidation.error,
+        errorCode: extensionValidation.errorCode,
+      });
       return NextResponse.json(
         {
           success: false,

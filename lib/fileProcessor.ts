@@ -39,13 +39,7 @@ export async function processFile(sessionId: number): Promise<ParseMetadata> {
     // Step 2: Download file from storage
     let fileBlob: Blob;
     try {
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileProcessor.ts:41',message:'Downloading file from storage',data:{sessionId,storagePath:session.file_storage_path,fileName:session.file_name,fileType:session.file_type},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H4'})}).catch(()=>{});
-      // #endregion
       fileBlob = await downloadFileFromStorage(STORAGE_BUCKET_NAME, session.file_storage_path);
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileProcessor.ts:43',message:'File downloaded successfully',data:{sessionId,blobSize:fileBlob.size,blobType:fileBlob.type},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H3,H4'})}).catch(()=>{});
-      // #endregion
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -67,31 +61,17 @@ export async function processFile(sessionId: number): Promise<ParseMetadata> {
     const file = new File([fileBlob], session.file_name, {
       type: session.file_type === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileProcessor.ts:61',message:'File object created from blob',data:{sessionId,fileName:file.name,fileSize:file.size,fileType:file.type},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H4'})}).catch(()=>{});
-    // #endregion
 
     // Step 4: Extract metadata (row and column counts)
     let metadata: ParseMetadata;
     try {
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileProcessor.ts:68',message:'Starting metadata extraction',data:{sessionId,fileName:file.name,fileSize:file.size},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1,H2,H3,H5,H6'})}).catch(()=>{});
-      // #endregion
       metadata = await getFileMetadata(file);
       console.log(
         `[FileProcessor] Extracted metadata for session ${sessionId}: ${metadata.rowCount} rows, ${metadata.columnCount} columns`
       );
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileProcessor.ts:80',message:'Metadata extracted successfully',data:{sessionId,rowCount:metadata.rowCount,columnCount:metadata.columnCount},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H5'})}).catch(()=>{});
-      // #endregion
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      const errorStack = error instanceof Error ? error.stack : undefined;
-      
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileProcessor.ts:73',message:'Metadata extraction failed',data:{sessionId,fileName:session.file_name,error:errorMessage,errorStack,fileSize:file.size,fileType:file.type},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1,H2,H3,H5,H6'})}).catch(()=>{});
-      // #endregion
 
       // Update session with error
       await supabase
@@ -128,9 +108,6 @@ export async function processFile(sessionId: number): Promise<ParseMetadata> {
     }
 
     // Step 6: Update session with metadata and new status
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileProcessor.ts:105',message:'Updating database with metadata',data:{sessionId,rowCount:metadata.rowCount,columnCount:metadata.columnCount,status:'analyzing_ean'},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H5'})}).catch(()=>{});
-    // #endregion
     const { error: updateError } = await supabase
       .from('import_sessions')
       .update({
@@ -144,16 +121,10 @@ export async function processFile(sessionId: number): Promise<ParseMetadata> {
       .eq('id', sessionId);
 
     if (updateError) {
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileProcessor.ts:117',message:'Database update failed',data:{sessionId,error:updateError.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H5'})}).catch(()=>{});
-      // #endregion
       throw new Error(
         `Failed to update session with metadata: ${updateError.message}`
       );
     }
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileProcessor.ts:120',message:'Database update successful',data:{sessionId,status:'analyzing_ean',rowCount:metadata.rowCount,columnCount:metadata.columnCount},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H5'})}).catch(()=>{});
-    // #endregion
 
     console.log(
       `[FileProcessor] Successfully processed session ${sessionId}: ${metadata.rowCount} rows, ${metadata.columnCount} columns`

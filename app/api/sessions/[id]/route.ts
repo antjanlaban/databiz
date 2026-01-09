@@ -83,11 +83,12 @@ export async function DELETE(
       }
 
       // Other database errors
+      const errorMessage = (fetchError as any)?.message || String(fetchError) || 'Unknown error';
       return NextResponse.json(
         {
           success: false,
           error: UploadErrorCode.DATABASE_ERROR,
-          message: `Failed to fetch session: ${fetchError.message}`,
+          message: `Failed to fetch session: ${errorMessage}`,
         },
         { status: 500 }
       );

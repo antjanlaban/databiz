@@ -1,6 +1,59 @@
 # Cursor AI Agent Instructions
 
-Please read and follow the instructions in [AI/README.md](AI/README.md) before starting any work.
+**BELANGRIJK**: Lees deze documentatie VOOR je begint met code schrijven:
 
-These instructions contain critical project guidelines, mandatory workflows, and coding patterns that must be followed.
+1. **[AI/Company/README.md](AI/Company/README.md)** - Project-specifieke context en agent richtlijnen
+   - Tech stack, architectuur, omgevingen
+   - **KRITISCH**: Agent richtlijnen om hallucinatie te voorkomen
+   - Roadmap, success criteria, workflow
+
+2. **[AI/Company/DESIGN_SYSTEM.md](AI/Company/DESIGN_SYSTEM.md)** - Design system voor UI ⚠️ **VERPLICHT VOOR UI TASKS**
+   - Design principles (Desktop-first, Dark mode only)
+   - Component library (shadcn/ui framework)
+   - Tone & voice (Nederlands voor UI)
+   - **MUST**: Lees dit document VOOR elke UI component
+   - **MUST**: Check shadcn/ui library eerst
+   - **MUST**: Doorloop compliance checklist
+
+3. **[AI/Company/CODE_QUALITY_STRATEGY.md](AI/Company/CODE_QUALITY_STRATEGY.md)** - Code quality patterns en standaarden ⚠️ **VERPLICHT VOOR CODE TASKS**
+   - Code organization patterns
+   - Error handling standards
+   - Logging patterns
+   - Type safety requirements
+   - AI agent guidelines
+   - **MUST**: Check dit document voor code patterns en consistentie
+
+4. **[AI/README.md](AI/README.md)** - Technische requirements en database model
+   - Database schema, import workflow
+   - Tech stack details, development workflow
+
+5. **[docs/README.md](docs/README.md)** - Domain documentatie
+   - Data-import domain model
+   - ETL workflows, test cases
+
+**KRITISCH**: Begin klein en duidelijk. Project struikelt vaak bij 80% - focus op completion, niet grote features. Zie `AI/Company/README.md` sectie "Agent Richtlijnen" voor details.
+
+**DESIGN SYSTEM ENFORCEMENT** (Voor UI tasks):
+- ⚠️ **MUST**: Lees `AI/Company/DESIGN_SYSTEM.md` VOOR elke UI component
+- ⚠️ **MUST**: Check shadcn/ui component library eerst
+- ⚠️ **MUST**: Doorloop compliance checklist (niet overslaanbaar)
+- ⚠️ **MUST**: Desktop-first (1440px minimum, GEEN responsive code)
+- ⚠️ **MUST**: Dark mode only (GEEN light mode code)
+- ⚠️ **MUST**: Use shadcn/ui components (GEEN custom zonder goedkeuring)
+- ❌ **BLOCK**: Code zonder design system verificatie wordt geweigerd
+- ❌ **BLOCK**: Custom componenten zonder eerst shadcn/ui te checken
+- ❌ **BLOCK**: Responsive/mobile code (desktop-only)
+- ❌ **BLOCK**: Light mode code (dark mode only)
+
+**CODE QUALITY ENFORCEMENT** (Voor alle code tasks):
+- ⚠️ **MUST**: Lees `AI/Company/CODE_QUALITY_STRATEGY.md` VOOR code schrijven
+- ⚠️ **MUST**: Volg error handling patterns (standardized response format)
+- ⚠️ **MUST**: Gebruik structured logging (GEEN console.log)
+- ⚠️ **MUST**: Volg type safety requirements (GEEN `any` types)
+- ⚠️ **MUST**: Check bestaande patterns voordat je nieuwe maakt
+- ❌ **BLOCK**: Code zonder pattern verificatie wordt geweigerd
+- ❌ **BLOCK**: console.log in productie code
+- ❌ **BLOCK**: Inconsistente error response formats
+- ❌ **BLOCK**: `any` types zonder goede reden
+
 

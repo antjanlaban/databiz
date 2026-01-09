@@ -71,6 +71,7 @@ When asked "Is X working?":
 - **Architecture**: `.ai/company/DDD_GUIDE.md`
 - **Trust/Safety**: `.ai/company/AGENT_TRUST_PROTOCOL.md` (Check before running commands)
 - **Registry**: `.ai/project/DOMAIN_REGISTRY.yaml`
+- **Code Quality (DataBiz)**: `AI/Company/CODE_QUALITY_STRATEGY.md` (Patterns, error handling, logging)
 
 ---
 

@@ -1,0 +1,11 @@
+{
+  "// INSTRUCTIES": "Kopieer dit bestand naar .vscode/settings.json en vul je token in",
+  "// WAARSCHUWING": "Dit bestand wordt NIET gecommit naar git (staat in .gitignore)",
+  "// TOKEN": "Haal je token op: https://supabase.com/dashboard/project/smpkbweozrkjalpceqwu/settings/access-tokens",
+  
+  "supabase.accessToken": "sbp_VERVANG_DIT_MET_JE_ECHTE_TOKEN",
+  "supabase.projectRef": "smpkbweozrkjalpceqwu",
+  
+  "// OPTIONEEL": "Als je de extensie niet gebruikt, kun je deze uitschakelen in Cursor Settings"
+}
+

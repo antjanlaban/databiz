@@ -4,6 +4,39 @@ Project: DataBiz (Bedrijfskleding Import System)
 Scope: Multi-tenant product import from supplier files (CSV/Excel)
 Target Users: Van Kruiningen Reclame + future workwear organizations
 
+## 📚 Belangrijke Documentatie voor AI Agents
+
+**VOOR JE BEGINT MET CODE SCHRIJVEN, LEES DEZE DOCUMENTATIE:**
+
+1. **[AI/Company/README.md](AI/Company/README.md)** - Project-specifieke context en richtlijnen voor DataBiz
+   - Tech stack, omgevingen, architectuur
+   - Agent richtlijnen (voorkom hallucinatie!)
+   - Roadmap en prioriteiten
+   - Success criteria
+
+2. **[AI/Company/DESIGN_SYSTEM.md](AI/Company/DESIGN_SYSTEM.md)** - Design system voor UI development ⚠️ **VERPLICHT VOOR UI TASKS**
+   - Design principles (Desktop-first, Dark mode only)
+   - Component library (shadcn/ui framework)
+   - Tone & voice (Nederlands voor UI)
+   - **MUST**: Lees dit document VOOR elke UI component
+   - **MUST**: Check shadcn/ui library eerst
+   - **MUST**: Doorloop compliance checklist
+
+3. **[AI/Company/CODE_QUALITY_STRATEGY.md](AI/Company/CODE_QUALITY_STRATEGY.md)** - Code quality patterns en standaarden ⚠️ **VERPLICHT VOOR CODE TASKS**
+   - Code organization patterns
+   - Error handling standards
+   - Logging patterns
+   - Type safety requirements
+   - AI agent guidelines
+   - **MUST**: Check dit document voor code patterns en consistentie
+
+4. **[docs/README.md](../docs/README.md)** - Domain documentatie
+   - Data-import domain model
+   - ETL workflows
+   - Test cases
+
+**KRITISCH**: Agents moeten eerst `AI/Company/README.md` lezen voordat ze code schrijven. Dit voorkomt hallucinatie en zorgt voor focus op completion.
+
 1. Project Vision
 DataBiz is a supplier product import system for workwear organizations that:
 
@@ -369,6 +402,10 @@ Tailwind CSS (styling).
 No external UI libraries (keep it simple).
 
 7. Development Workflow
+
+**BELANGRIJK**: Lees eerst `AI/Company/README.md` voor project context en agent richtlijnen!
+**BELANGRIJK**: Check `AI/Company/CODE_QUALITY_STRATEGY.md` voor code quality patterns!
+
 Setup
 bash
 # Clone locally
@@ -399,15 +436,25 @@ Check Table Editor → all 8 tables exist.
 Code Changes
 In Cursor (or Codespaces):
 
-Write prompt with explicit DO's and DON'Ts.
+1. **Read First**: `AI/Company/README.md`, `AI/Company/DESIGN_SYSTEM.md`, en `AI/Company/CODE_QUALITY_STRATEGY.md`
+2. **For UI tasks**: MUST read `AI/Company/DESIGN_SYSTEM.md` and check shadcn/ui library first
+3. **For Code tasks**: MUST read `AI/Company/CODE_QUALITY_STRATEGY.md` and follow patterns
+4. **Design System Compliance**: MUST complete compliance checklist before writing UI code
+5. **Code Quality Compliance**: MUST follow error handling, logging, and type safety patterns
+6. Write prompt with explicit DO's and DON'Ts.
+7. AI generates code (kleine incrementele stappen, focus op completion).
+8. Review.
+9. Test against running Supabase Dev.
+10. Commit & push.
 
-AI generates code.
+**Agent Workflow**: Zie `AI/Company/README.md` sectie "Agent Richtlijnen" voor kritische richtlijnen om hallucinatie te voorkomen.
 
-Review.
-
-Test against running Supabase Dev.
-
-Commit & push.
+**Design System Enforcement**: 
+- ⚠️ **MUST**: Check `AI/Company/DESIGN_SYSTEM.md` voor elke UI component
+- ⚠️ **MUST**: Use shadcn/ui components (geen custom zonder goedkeuring)
+- ⚠️ **MUST**: Desktop-first (1440px minimum, geen responsive)
+- ⚠️ **MUST**: Dark mode only (geen light mode code)
+- ⚠️ **MUST**: Complete compliance checklist before proceeding
 
 8. Example Prompt Template for AI
 Use this template when asking AI to build something:
@@ -415,24 +462,45 @@ Use this template when asking AI to build something:
 text
 Context:
 - Project: DataBiz (supplier product import system).
-- This is defined in requirements.md (read it first!).
-- Stack: Next.js 15 + Supabase + minimal UI.
+- Read FIRST: AI/Company/README.md (project context) and AI/Company/DESIGN_SYSTEM.md (UI patterns).
+- This document (AI/README.md) contains database model and technical requirements.
+- Stack: Next.js 15 + Supabase + shadcn/ui (Tailwind CSS + Radix UI).
 - Supabase Dev is at [URL], anon key [KEY].
 
 Task:
 [Describe exactly what you want built: 1 screen, 1 API route, 1 schema change, etc.]
 
 DO:
+- Read AI/Company/README.md first for agent richtlijnen.
+- **For UI tasks**: MUST read AI/Company/DESIGN_SYSTEM.md and check shadcn/ui library first.
+- **For Code tasks**: MUST read AI/Company/CODE_QUALITY_STRATEGY.md and follow patterns.
+- **Design System Compliance**: MUST complete compliance checklist before writing UI code.
+- **Code Quality Compliance**: MUST follow error handling, logging, and type safety patterns from CODE_QUALITY_STRATEGY.md.
+- Begin klein en duidelijk - voorkom hallucinatie.
+- Focus op completion, niet grote features.
 - Only modify files: [list specific files].
-- Use the exact table/column names from requirements.md.
+- Use the exact table/column names from this document.
+- **MUST**: Use shadcn/ui components for UI (geen custom zonder goedkeuring).
+- **MUST**: Desktop-first (1440px minimum, geen responsive code).
+- **MUST**: Dark mode only (geen light mode code).
+- **MUST**: Follow error response format from CODE_QUALITY_STRATEGY.md.
+- **MUST**: Use structured logging (no console.log).
 - Test against actual Supabase Dev after changes.
 - Add error handling.
 
 DON'T:
-- Create new tables or change existing schema.
-- Add npm packages.
-- Use authentication.
+- Create new tables or change existing schema without approval.
+- Add npm packages without permission.
+- Use authentication (not required yet).
 - Change UI components outside the scope.
+- Build large features in one go - kleine incrementele stappen.
+- **DON'T**: Write UI code without checking AI/Company/DESIGN_SYSTEM.md first.
+- **DON'T**: Write code without checking AI/Company/CODE_QUALITY_STRATEGY.md first.
+- **DON'T**: Create custom components without checking shadcn/ui first.
+- **DON'T**: Add responsive/mobile code (desktop-only).
+- **DON'T**: Add light mode code (dark mode only).
+- **DON'T**: Use console.log (use structured logging).
+- **DON'T**: Mix error response formats (follow CODE_QUALITY_STRATEGY.md).
 
 Show me:
 1. Brief summary of what you'll do (5 bullets).

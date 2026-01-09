@@ -98,7 +98,7 @@ export async function processEANAnalysis(sessionId: number): Promise<void> {
                   resolve(); // Continue with fallback
                 }
               },
-              error: (error) => {
+              error: (error: Error) => {
                 console.error('[EANAnalysis] PapaParse error:', error);
                 resolve(); // Continue with fallback
               },
@@ -286,6 +286,73 @@ export async function processEANAnalysis(sessionId: number): Promise<void> {
       throw new Error(`EAN analysis failed: ${errorMessage}`);
     }
 
+    // Step 7.5: Check 95% policy - reject if less than 95% of rows have valid EAN codes
+    if (analysisResult.totalRows === 0) {
+      // No data rows found
+      const pathParts = session.file_storage_path.split('/');
+      const uuidFromPath = pathParts.length >= 2 ? pathParts[1] : sessionId.toString();
+      
+      let newStoragePath = session.file_storage_path;
+      try {
+        newStoragePath = await moveToRejected(
+          uuidFromPath,
+          session.file_name,
+          session.file_storage_path
+        );
+        console.log(`[EANAnalysis] File moved to rejected/: ${newStoragePath}`);
+      } catch (moveError) {
+        console.error(`[EANAnalysis] Failed to move file to rejected/: ${moveError}`);
+      }
+      
+      await supabase
+        .from('import_sessions')
+        .update({
+          status: 'rejected',
+          error_message: 'Geen data rijen gevonden in bestand.',
+          ean_analysis_at: new Date().toISOString(),
+          file_storage_path: newStoragePath,
+        })
+        .eq('id', sessionId);
+
+      console.log(`[EANAnalysis] Session ${sessionId}: File rejected - no data rows`);
+      return;
+    }
+
+    if (analysisResult.validEANPercentage < 95) {
+      // Less than 95% of rows have valid EAN codes - reject
+      console.log(`[EANAnalysis] Session ${sessionId}: Insufficient valid EAN codes (${analysisResult.validEANPercentage.toFixed(1)}%) - rejecting file`);
+      
+      const pathParts = session.file_storage_path.split('/');
+      const uuidFromPath = pathParts.length >= 2 ? pathParts[1] : sessionId.toString();
+      
+      let newStoragePath = session.file_storage_path;
+      try {
+        newStoragePath = await moveToRejected(
+          uuidFromPath,
+          session.file_name,
+          session.file_storage_path
+        );
+        console.log(`[EANAnalysis] File moved to rejected/: ${newStoragePath}`);
+      } catch (moveError) {
+        console.error(`[EANAnalysis] Failed to move file to rejected/: ${moveError}`);
+      }
+      
+      const errorMessage = `Onvoldoende geldige EAN codes: ${analysisResult.totalEANs} van ${analysisResult.totalRows} rijen hebben een geldige EAN code (${analysisResult.validEANPercentage.toFixed(1)}%). Minimum 95% vereist.`;
+      
+      await supabase
+        .from('import_sessions')
+        .update({
+          status: 'rejected',
+          error_message: errorMessage,
+          ean_analysis_at: new Date().toISOString(),
+          file_storage_path: newStoragePath,
+        })
+        .eq('id', sessionId);
+
+      console.log(`[EANAnalysis] Session ${sessionId}: File rejected - insufficient valid EAN codes`);
+      return;
+    }
+
     // Step 8: Move file to approved/ folder and update database with results
     // Extract UUID from storage path for file move
     const pathParts = session.file_storage_path.split('/');
@@ -329,6 +396,22 @@ export async function processEANAnalysis(sessionId: number): Promise<void> {
     console.log(
       `[EANAnalysis] Successfully analyzed and approved session ${sessionId}: ${analysisResult.uniqueCount} unique EANs, ${analysisResult.duplicateCount} duplicates`
     );
+
+    // Trigger JSON conversion automatically (fire-and-forget)
+    // JSON conversion will be picked up by process-queue
+    try {
+      const origin = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      fetch(`${origin}/api/process-queue`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      }).catch((err) => {
+        console.error('[EANAnalysis] Failed to trigger JSON conversion:', err);
+        // Don't fail the request if JSON conversion trigger fails
+      });
+    } catch (triggerError) {
+      console.error('[EANAnalysis] Error triggering JSON conversion:', triggerError);
+      // Continue - JSON conversion will be picked up by next queue poll
+    }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
@@ -399,6 +482,73 @@ export async function processEANAnalysisWithColumn(
     // Step 3: Analyze EANs
     const analysisResult = await analyzeEANs(file, columnName);
 
+    // Step 3.5: Check 95% policy - reject if less than 95% of rows have valid EAN codes
+    if (analysisResult.totalRows === 0) {
+      // No data rows found
+      const pathParts = session.file_storage_path.split('/');
+      const uuidFromPath = pathParts.length >= 2 ? pathParts[1] : sessionId.toString();
+      
+      let newStoragePath = session.file_storage_path;
+      try {
+        newStoragePath = await moveToRejected(
+          uuidFromPath,
+          session.file_name,
+          session.file_storage_path
+        );
+        console.log(`[EANAnalysis] File moved to rejected/: ${newStoragePath}`);
+      } catch (moveError) {
+        console.error(`[EANAnalysis] Failed to move file to rejected/: ${moveError}`);
+      }
+      
+      await supabase
+        .from('import_sessions')
+        .update({
+          status: 'rejected',
+          error_message: 'Geen data rijen gevonden in bestand.',
+          ean_analysis_at: new Date().toISOString(),
+          file_storage_path: newStoragePath,
+        })
+        .eq('id', sessionId);
+
+      console.log(`[EANAnalysis] Session ${sessionId}: File rejected - no data rows`);
+      return;
+    }
+
+    if (analysisResult.validEANPercentage < 95) {
+      // Less than 95% of rows have valid EAN codes - reject
+      console.log(`[EANAnalysis] Session ${sessionId}: Insufficient valid EAN codes (${analysisResult.validEANPercentage.toFixed(1)}%) - rejecting file`);
+      
+      const pathParts = session.file_storage_path.split('/');
+      const uuidFromPath = pathParts.length >= 2 ? pathParts[1] : sessionId.toString();
+      
+      let newStoragePath = session.file_storage_path;
+      try {
+        newStoragePath = await moveToRejected(
+          uuidFromPath,
+          session.file_name,
+          session.file_storage_path
+        );
+        console.log(`[EANAnalysis] File moved to rejected/: ${newStoragePath}`);
+      } catch (moveError) {
+        console.error(`[EANAnalysis] Failed to move file to rejected/: ${moveError}`);
+      }
+      
+      const errorMessage = `Onvoldoende geldige EAN codes: ${analysisResult.totalEANs} van ${analysisResult.totalRows} rijen hebben een geldige EAN code (${analysisResult.validEANPercentage.toFixed(1)}%). Minimum 95% vereist.`;
+      
+      await supabase
+        .from('import_sessions')
+        .update({
+          status: 'rejected',
+          error_message: errorMessage,
+          ean_analysis_at: new Date().toISOString(),
+          file_storage_path: newStoragePath,
+        })
+        .eq('id', sessionId);
+
+      console.log(`[EANAnalysis] Session ${sessionId}: File rejected - insufficient valid EAN codes`);
+      return;
+    }
+
     // Step 4: Move file to approved/ folder and update database
     // Extract UUID from storage path for file move
     const pathParts = session.file_storage_path.split('/');
@@ -441,6 +591,22 @@ export async function processEANAnalysisWithColumn(
     console.log(
       `[EANAnalysis] Successfully analyzed and approved session ${sessionId} with column ${columnName}: ${analysisResult.uniqueCount} unique EANs, ${analysisResult.duplicateCount} duplicates`
     );
+
+    // Trigger JSON conversion automatically (fire-and-forget)
+    // JSON conversion will be picked up by process-queue
+    try {
+      const origin = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      fetch(`${origin}/api/process-queue`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      }).catch((err) => {
+        console.error('[EANAnalysis] Failed to trigger JSON conversion:', err);
+        // Don't fail the request if JSON conversion trigger fails
+      });
+    } catch (triggerError) {
+      console.error('[EANAnalysis] Error triggering JSON conversion:', triggerError);
+      // Continue - JSON conversion will be picked up by next queue poll
+    }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
 

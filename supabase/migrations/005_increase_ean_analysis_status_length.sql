@@ -6,3 +6,4 @@
 ALTER TABLE import_sessions
   ALTER COLUMN ean_analysis_status TYPE VARCHAR(50);
 
+

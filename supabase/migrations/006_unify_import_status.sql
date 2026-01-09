@@ -105,3 +105,4 @@ CREATE INDEX IF NOT EXISTS idx_import_sessions_status_failed
 -- Note: ean_analysis_at column is kept for historical tracking
 -- unique_ean_count, duplicate_ean_count, detected_ean_column are also kept
 
+

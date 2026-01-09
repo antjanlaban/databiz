@@ -59,7 +59,7 @@ export const parseCSV = async (file: File): Promise<ParseResult> => {
 
         resolve({ data, errors });
       },
-      error: (error) => {
+      error: (error: Error) => {
         resolve({ data: [], errors: [error.message] });
       },
     });
@@ -199,9 +199,6 @@ export async function getFileMetadata(file: File): Promise<ParseMetadata> {
  * @returns ParseMetadata
  */
 async function getCSVMetadata(file: File): Promise<ParseMetadata> {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileParser.ts:195',message:'Starting CSV metadata extraction',data:{fileName:file.name,fileSize:file.size,fileType:file.type},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H5'})}).catch(()=>{});
-  // #endregion
   console.log('[FileParser] Starting CSV metadata extraction:', {
     fileName: file.name,
     fileSize: file.size,
@@ -211,10 +208,6 @@ async function getCSVMetadata(file: File): Promise<ParseMetadata> {
   // Read file as text first to avoid FileReaderSync issue in Node.js
   // FileReaderSync is browser-only and not available in server-side context
   const text = await file.text();
-  
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileParser.ts:202',message:'File read as text',data:{fileName:file.name,textLength:text.length,firstChars:text.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H5'})}).catch(()=>{});
-  // #endregion
 
   return new Promise((resolve, reject) => {
     let rowCount = 0;
@@ -224,9 +217,6 @@ async function getCSVMetadata(file: File): Promise<ParseMetadata> {
     Papa.parse(text, {
       header: false,
       skipEmptyLines: true,
-      encoding: 'UTF-8',
-      delimiter: '', // Auto-detect delimiter
-      newline: '', // Auto-detect newline
       quoteChar: '"',
       escapeChar: '"',
       worker: false, // Disable worker to avoid FileReaderSync issue
@@ -252,19 +242,12 @@ async function getCSVMetadata(file: File): Promise<ParseMetadata> {
         // Exclude header row from count (first row is usually header)
         const dataRowCount = Math.max(0, rowCount > 0 ? rowCount - 1 : 0);
         
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileParser.ts:236',message:'CSV metadata extraction complete',data:{rowCount:dataRowCount,columnCount,fileName:file.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H1,H2,H3'})}).catch(()=>{});
-        // #endregion
-        
         resolve({
           rowCount: dataRowCount,
           columnCount: columnCount,
         });
       },
-      error: (error) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/e76be008-7184-4337-ad4e-a2bce7ed3b96',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'fileParser.ts:245',message:'CSV parsing error',data:{error:error.message,errorType:error.type,errorCode:error.code,fileName:file.name,fileSize:file.size},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'H1,H2,H5,H6'})}).catch(()=>{});
-        // #endregion
+      error: (error: any) => {
         console.error('[FileParser] CSV parsing error details:', {
           message: error.message,
           type: error.type,
@@ -299,7 +282,9 @@ async function getExcelMetadata(file: File): Promise<ParseMetadata> {
     let rowCount = 0;
     worksheet.eachRow((row, rowNumber) => {
       // Check if row has any data
-      const hasData = row.values.some(
+      const values = row.values;
+      if (!values || !Array.isArray(values)) return;
+      const hasData = values.some(
         (cell, index) => index > 0 && cell !== null && cell !== undefined && cell !== ''
       );
       if (hasData) {
@@ -382,7 +367,7 @@ async function extractEANColumnValuesCSV(file: File, columnName: string): Promis
       complete: () => {
         resolve(values);
       },
-      error: (error) => {
+      error: (error: Error) => {
         reject(new Error(`Failed to extract column values from CSV: ${error.message}`));
       },
     });
@@ -421,10 +406,11 @@ async function extractEANColumnValuesExcel(file: File, columnName: string): Prom
     }
 
     // Extract values from data rows
+    const finalColumnIndex = columnIndex; // Type narrowing
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) return; // Skip header row
 
-      const cell = row.getCell(columnIndex);
+      const cell = row.getCell(finalColumnIndex);
       const value = cell.value;
 
       if (value !== null && value !== undefined && value !== '') {

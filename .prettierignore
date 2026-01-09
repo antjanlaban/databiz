@@ -1,0 +1,38 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.next
+out
+dist
+build
+
+# Coverage
+coverage
+*.lcov
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Cache
+.cache
+.parcel-cache
+.eslintcache
+
+# Generated files
+next-env.d.ts
+*.tsbuildinfo
+
+# Database
+*.db
+*.sqlite
+
+# Misc
+.DS_Store
+*.pem
+

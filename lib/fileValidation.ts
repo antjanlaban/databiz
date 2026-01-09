@@ -19,12 +19,23 @@ export interface ValidationResult {
  */
 export function validateFileExtension(file: File): ValidationResult {
   const fileName = file.name.toLowerCase();
-  const extension = fileName.substring(fileName.lastIndexOf('.'));
+  const lastDotIndex = fileName.lastIndexOf('.');
+  
+  // Check if file has an extension
+  if (lastDotIndex === -1 || lastDotIndex === fileName.length - 1) {
+    return {
+      valid: false,
+      error: getErrorMessage(UploadErrorCode.FILE_EXTENSION_INVALID) + ` (no extension found)`,
+      errorCode: UploadErrorCode.FILE_EXTENSION_INVALID,
+    };
+  }
+  
+  const extension = fileName.substring(lastDotIndex);
 
   if (!ALLOWED_FILE_EXTENSIONS.includes(extension as any)) {
     return {
       valid: false,
-      error: getErrorMessage(UploadErrorCode.FILE_EXTENSION_INVALID),
+      error: getErrorMessage(UploadErrorCode.FILE_EXTENSION_INVALID) + ` (found: ${extension})`,
       errorCode: UploadErrorCode.FILE_EXTENSION_INVALID,
     };
   }

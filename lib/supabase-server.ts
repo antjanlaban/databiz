@@ -40,3 +40,4 @@ export function getSupabaseServer(): SupabaseClient {
   return supabaseServerInstance;
 }
 
+

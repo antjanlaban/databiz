@@ -1,4 +1,4 @@
-import { extractEANColumnValues } from './fileParser';
+import { extractEANColumnValues, getFileMetadata } from './fileParser';
 import { validateGTIN13 } from './eanDetection';
 
 /**
@@ -8,6 +8,8 @@ export interface EANAnalysisResult {
   uniqueCount: number;
   duplicateCount: number;
   totalEANs: number;
+  totalRows: number;
+  validEANPercentage: number;
 }
 
 /**
@@ -19,6 +21,10 @@ export interface EANAnalysisResult {
  * @returns Promise resolving to analysis results
  */
 export async function analyzeEANs(file: File, eanColumnName: string): Promise<EANAnalysisResult> {
+  // Get total number of rows in the file
+  const metadata = await getFileMetadata(file);
+  const totalRows = metadata.rowCount;
+
   // Extract all EAN values from the column
   const eanValues = await extractEANColumnValues(file, eanColumnName);
 
@@ -42,10 +48,16 @@ export async function analyzeEANs(file: File, eanColumnName: string): Promise<EA
   // Count duplicates: EAN codes that appear more than once
   const duplicateCount = uniqueEANs.filter(ean => eanCounts[ean] > 1).length;
 
+  // Calculate percentage of rows with valid EAN codes
+  const validEANPercentage = totalRows > 0 ? (totalEANs / totalRows) * 100 : 0;
+
   return {
     uniqueCount,
     duplicateCount,
     totalEANs,
+    totalRows,
+    validEANPercentage,
   };
 }
+
 

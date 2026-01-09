@@ -41,3 +41,4 @@ describe('Select EAN Column API', () => {
 // - Database cleanup between tests
 // - Session setup with 'pending_column_selection' status
 
+
